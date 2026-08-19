@@ -395,145 +395,444 @@ def match_ready_status():
         pass
 
 
-@app.route("/classic-dashboard", methods=["GET", "POST"])
+@app.route(
+    "/classic-dashboard",
+    methods=["GET", "POST"]
+)
 def classic_dashboard():
 
-    try:
+    # -----------------------------------------
+    # LOGIN CHECK
+    # -----------------------------------------
 
-        # -----------------------------------------
-        # LOGIN CHECK
-        # -----------------------------------------
+    if "userid" not in session:
 
-        if "userid" not in session:
-            return redirect(url_for("login"))
+        return redirect(
+            url_for("login")
+        )
 
-        current_userid = session["userid"]
+    current_userid = session["userid"]
 
-        # Genuine user activity
-        update_user_activity()
 
-        # -----------------------------------------
-        # GET CURRENT USER BALANCE
-        # -----------------------------------------
+    # -----------------------------------------
+    # GET CURRENT USER BALANCE
+    # -----------------------------------------
 
-        with db_engine.begin() as connection:
+    with db_engine.begin() as connection:
 
-            result = connection.execute(
-                text("""
-                    SELECT money
-                    FROM lpusers
-                    WHERE userid = :userid
-                """),
-                {
-                    "userid": current_userid
-                }
-            ).fetchone()
+        result = connection.execute(
+            text("""
+                SELECT
+                    money
 
-        balance = result.money if result else 0
+                FROM lpusers
 
-        # -----------------------------------------
-        # CHECK ACTIVE INITIATED MATCH
-        # -----------------------------------------
+                WHERE userid = :userid
+            """),
+            {
+                "userid":
+                    current_userid
+            }
+        ).fetchone()
 
-        with db_engine.begin() as connection:
 
-            active_match = connection.execute(
-                text("""
-                    SELECT matchbatchnumber
-                    FROM usersmatches
-                    WHERE initiateduseruuid = :userid
-                    AND matchterminatedbytime = 0
-                    LIMIT 1
-                """),
-                {
-                    "userid": current_userid
-                }
-            ).fetchone()
+    balance = (
+        result.money
+        if result
+        else 0
+    )
 
-        can_start_match = active_match is None
+
+    # -----------------------------------------
+    # CHECK ACTIVE INITIATED MATCH
+    # -----------------------------------------
+
+    with db_engine.begin() as connection:
+
+        active_match = connection.execute(
+            text("""
+                SELECT
+                    matchbatchnumber
+
+                FROM usersmatches
+
+                WHERE
+                    initiateduseruuid = :userid
+
+                    AND
+                    matchterminatedbytime = 0
+
+                LIMIT 1
+            """),
+            {
+                "userid":
+                    current_userid
+            }
+        ).fetchone()
+
+
+    can_start_match = (
+        active_match is None
+    )
+
+
+    # ==================================================
+    # POST REQUEST
+    # ==================================================
+
+    if request.method == "POST":
+
+        action = request.form.get(
+            "action"
+        )
+
 
         # ==================================================
-        # POST REQUEST
+        # INITIATE NEW MATCH
         # ==================================================
 
-        if request.method == "POST":
+        if action == "initiate_match":
 
-            action = request.form.get("action")
+            if not can_start_match:
 
-            # ==================================================
-            # INITIATE NEW MATCH
-            # ==================================================
-
-            if action == "initiate_match":
-
-                # User cannot initiate another active match
-
-                if not can_start_match:
-
-                    return redirect(
-                        url_for("classic_dashboard")
+                return redirect(
+                    url_for(
+                        "classic_dashboard"
                     )
+                )
 
-                # -----------------------------------------
-                # GET AMOUNT
-                # -----------------------------------------
 
-                try:
+            # -----------------------------------------
+            # GET AMOUNT
+            # -----------------------------------------
 
-                    amount = int(
-                        request.form.get("amount", 0)
+            try:
+
+                amount = int(
+                    request.form.get(
+                        "amount",
+                        0
                     )
+                )
 
-                except (ValueError, TypeError):
+            except (
+                ValueError,
+                TypeError
+            ):
+
+                flash(
+                    "Invalid amount.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for(
+                        "classic_dashboard"
+                    )
+                )
+
+
+            # -----------------------------------------
+            # AMOUNT VALIDATION
+            # -----------------------------------------
+
+            if (
+                amount < 50
+                or
+                amount > 5000000
+                or
+                amount % 50 != 0
+            ):
+
+                flash(
+                    "Invalid amount.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for(
+                        "classic_dashboard"
+                    )
+                )
+
+
+            # -----------------------------------------
+            # BALANCE CHECK
+            # -----------------------------------------
+
+            if balance < amount:
+
+                flash(
+                    "Low Balance. Please increase the balance to continue.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for(
+                        "classic_dashboard"
+                    )
+                )
+
+
+            # -----------------------------------------
+            # GET SELECTED COLOR
+            # -----------------------------------------
+
+            selected_color = request.form.get(
+                "color"
+            )
+
+
+            # -----------------------------------------
+            # OPEN COLOR MODAL
+            # -----------------------------------------
+
+            if not selected_color:
+
+                return render_template(
+                    "classic_dashboard.html",
+
+                    balance=balance,
+
+                    matches=get_available_matches(
+                        current_userid
+                    ),
+
+                    selected_amount=amount,
+
+                    show_color_modal=True,
+
+                    can_start_match=
+                        can_start_match,
+
+                    should_monitor_match=False
+                )
+
+
+            # -----------------------------------------
+            # VALID COLORS
+            # -----------------------------------------
+
+            allowed_colors = {
+                "red",
+                "blue",
+                "green",
+                "yellow"
+            }
+
+
+            if selected_color not in allowed_colors:
+
+                flash(
+                    "Please select a valid colour.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for(
+                        "classic_dashboard"
+                    )
+                )
+
+
+            # -----------------------------------------
+            # CREATE NEW MATCH
+            # -----------------------------------------
+
+            with db_engine.begin() as connection:
+
+                while True:
+
+                    matchbatchnumber = str(
+                        uuid.uuid4().int
+                    )[-8:]
+
+
+                    existing_match = connection.execute(
+                        text("""
+                            SELECT
+                                matchbatchnumber
+
+                            FROM usersmatches
+
+                            WHERE matchbatchnumber =
+                                :matchbatchnumber
+                        """),
+                        {
+                            "matchbatchnumber":
+                                matchbatchnumber
+                        }
+                    ).fetchone()
+
+
+                    if not existing_match:
+
+                        break
+
+
+                connection.execute(
+                    text("""
+                        INSERT INTO usersmatches
+                        (
+                            matchbatchnumber,
+                            initiateduseruuid,
+                            amount,
+                            matchstarttime,
+                            initiatedusercolor,
+                            timelength,
+                            matchterminatedbytime,
+                            user1ready,
+                            user2ready,
+                            matchstarted,
+                            terminatedby,
+                            terminatedtime,
+                            terminatedbyother
+                        )
+
+                        VALUES
+                        (
+                            :matchbatchnumber,
+                            :initiateduseruuid,
+                            :amount,
+                            NOW(),
+                            :initiatedusercolor,
+                            60,
+                            0,
+                            0,
+                            0,
+                            0,
+                            NULL,
+                            NULL,
+                            0
+                        )
+                    """),
+                    {
+                        "matchbatchnumber":
+                            matchbatchnumber,
+
+                        "initiateduseruuid":
+                            current_userid,
+
+                        "amount":
+                            amount,
+
+                        "initiatedusercolor":
+                            selected_color
+                    }
+                )
+
+
+            flash(
+                "Match started successfully.",
+                "success"
+            )
+
+            return redirect(
+                url_for(
+                    "classic_dashboard"
+                )
+            )
+
+
+        # ==================================================
+        # JOIN EXISTING MATCH
+        # ==================================================
+
+        elif action == "join_match":
+
+            matchbatchnumber = request.form.get(
+                "matchbatchnumber"
+            )
+
+            selected_color = request.form.get(
+                "color"
+            )
+
+
+            if not matchbatchnumber:
+
+                flash(
+                    "Match not found.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for(
+                        "classic_dashboard"
+                    )
+                )
+
+
+            with db_engine.begin() as connection:
+
+                match = connection.execute(
+                    text("""
+                        SELECT
+                            matchbatchnumber,
+                            amount,
+                            initiateduseruuid,
+                            initiatedusercolor,
+                            secondplayeruuid,
+                            matchterminatedbytime
+
+                        FROM usersmatches
+
+                        WHERE
+                            matchbatchnumber =
+                                :matchbatchnumber
+
+                            AND
+                            matchterminatedbytime = 0
+
+                            AND
+                            initiateduseruuid != :userid
+
+                            AND
+                            secondplayeruuid IS NULL
+
+                        LIMIT 1
+                    """),
+                    {
+                        "matchbatchnumber":
+                            matchbatchnumber,
+
+                        "userid":
+                            current_userid
+                    }
+                ).fetchone()
+
+
+                if not match:
 
                     flash(
-                        "Invalid amount.",
+                        "This match is no longer available.",
                         "error"
                     )
 
                     return redirect(
-                        url_for("classic_dashboard")
+                        url_for(
+                            "classic_dashboard"
+                        )
                     )
 
+
                 # -----------------------------------------
-                # AMOUNT VALIDATION
+                # SECOND PLAYER BALANCE CHECK
                 # -----------------------------------------
 
-                if (
-                    amount < 50
-                    or amount > 5000000
-                    or amount % 50 != 0
-                ):
+                if balance < match.amount:
 
                     flash(
-                        "Invalid amount.",
+                        "Low Balance. Please add balance to continue.",
                         "error"
                     )
 
                     return redirect(
-                        url_for("classic_dashboard")
+                        url_for(
+                            "classic_dashboard"
+                        )
                     )
 
-                # -----------------------------------------
-                # BALANCE CHECK
-                # -----------------------------------------
-
-                if balance < amount:
-
-                    flash(
-                        "Low Balance. Please increase the balance to continue.",
-                        "error"
-                    )
-
-                    return redirect(
-                        url_for("classic_dashboard")
-                    )
-
-                # -----------------------------------------
-                # GET SELECTED COLOR
-                # -----------------------------------------
-
-                selected_color = request.form.get("color")
 
                 # -----------------------------------------
                 # OPEN COLOR MODAL
@@ -550,15 +849,20 @@ def classic_dashboard():
                             current_userid
                         ),
 
-                        selected_amount=amount,
+                        join_match_number=
+                            matchbatchnumber,
 
-                        show_color_modal=True,
+                        initiator_color=
+                            match.initiatedusercolor,
+
+                        show_join_color_modal=True,
 
                         can_start_match=
                             can_start_match,
 
                         should_monitor_match=False
                     )
+
 
                 # -----------------------------------------
                 # VALID COLORS
@@ -571,6 +875,7 @@ def classic_dashboard():
                     "yellow"
                 }
 
+
                 if selected_color not in allowed_colors:
 
                     flash(
@@ -579,284 +884,98 @@ def classic_dashboard():
                     )
 
                     return redirect(
-                        url_for("classic_dashboard")
+                        url_for(
+                            "classic_dashboard"
+                        )
                     )
 
+
                 # -----------------------------------------
-                # CREATE NEW MATCH
+                # PLAYER 1 COLOR CANNOT BE USED
                 # -----------------------------------------
 
-                with db_engine.begin() as connection:
-
-                    while True:
-
-                        matchbatchnumber = str(
-                            uuid.uuid4().int
-                        )[-8:]
-
-                        existing_match = connection.execute(
-                            text("""
-                                SELECT matchbatchnumber
-                                FROM usersmatches
-                                WHERE matchbatchnumber =
-                                    :matchbatchnumber
-                            """),
-                            {
-                                "matchbatchnumber":
-                                    matchbatchnumber
-                            }
-                        ).fetchone()
-
-                        if not existing_match:
-                            break
-
-                    connection.execute(
-                        text("""
-                            INSERT INTO usersmatches
-                            (
-                                matchbatchnumber,
-                                initiateduseruuid,
-                                amount,
-                                matchstarttime,
-                                initiatedusercolor,
-                                timelength,
-                                matchterminatedbytime,
-                                user1ready,
-                                user2ready,
-                                matchstarted,
-                                terminatedby,
-                                terminatedtime,
-                                terminatedbyother
-                            )
-                            VALUES
-                            (
-                                :matchbatchnumber,
-                                :initiateduseruuid,
-                                :amount,
-                                NOW(),
-                                :initiatedusercolor,
-                                60,
-                                0,
-                                0,
-                                0,
-                                0,
-                                NULL,
-                                NULL,
-                                0
-                            )
-                        """),
-                        {
-                            "matchbatchnumber":
-                                matchbatchnumber,
-
-                            "initiateduseruuid":
-                                current_userid,
-
-                            "amount":
-                                amount,
-
-                            "initiatedusercolor":
-                                selected_color
-                        }
-                    )
-
-                flash(
-                    "Match started successfully.",
-                    "success"
-                )
-
-                return redirect(
-                    url_for("classic_dashboard")
-                )
-
-            # ==================================================
-            # JOIN EXISTING MATCH
-            # ==================================================
-
-            elif action == "join_match":
-
-                matchbatchnumber = request.form.get(
-                    "matchbatchnumber"
-                )
-
-                selected_color = request.form.get(
-                    "color"
-                )
-
-                if not matchbatchnumber:
+                if (
+                    selected_color ==
+                    match.initiatedusercolor
+                ):
 
                     flash(
-                        "Match not found.",
+                        "Please select another color. "
+                        "This color is already selected by Player 1.",
                         "error"
                     )
 
                     return redirect(
-                        url_for("classic_dashboard")
+                        url_for(
+                            "classic_dashboard"
+                        )
                     )
 
-                with db_engine.begin() as connection:
 
-                    match = connection.execute(
-                        text("""
-                            SELECT
-                                matchbatchnumber,
-                                amount,
-                                initiateduseruuid,
-                                initiatedusercolor,
-                                secondplayeruuid,
-                                matchterminatedbytime
-                            FROM usersmatches
-                            WHERE matchbatchnumber =
+                # -----------------------------------------
+                # ADD SECOND PLAYER
+                # -----------------------------------------
+
+                connection.execute(
+                    text("""
+                        UPDATE usersmatches
+
+                        SET
+                            secondplayeruuid =
+                                :secondplayeruuid,
+
+                            secondplayeraccepttime =
+                                NOW(),
+
+                            secondplayercolor =
+                                :secondplayercolor
+
+                        WHERE
+                            matchbatchnumber =
                                 :matchbatchnumber
 
-                            AND matchterminatedbytime = 0
+                            AND
+                            secondplayeruuid IS NULL
 
-                            AND initiateduseruuid != :userid
+                            AND
+                            matchterminatedbytime = 0
+                    """),
+                    {
+                        "secondplayeruuid":
+                            current_userid,
 
-                            AND secondplayeruuid IS NULL
+                        "secondplayercolor":
+                            selected_color,
 
-                            LIMIT 1
-                        """),
-                        {
-                            "matchbatchnumber":
-                                matchbatchnumber,
-
-                            "userid":
-                                current_userid
-                        }
-                    ).fetchone()
-
-                    if not match:
-
-                        flash(
-                            "This match is no longer available.",
-                            "error"
-                        )
-
-                        return redirect(
-                            url_for("classic_dashboard")
-                        )
-
-                    # -----------------------------------------
-                    # SECOND PLAYER BALANCE CHECK
-                    # -----------------------------------------
-
-                    if balance < match.amount:
-
-                        flash(
-                            "Low Balance. Please add balance to continue.",
-                            "error"
-                        )
-
-                        return redirect(
-                            url_for("classic_dashboard")
-                        )
-
-                    # -----------------------------------------
-                    # OPEN COLOR MODAL
-                    # -----------------------------------------
-
-                    if not selected_color:
-
-                        return render_template(
-                            "classic_dashboard.html",
-
-                            balance=balance,
-
-                            matches=get_available_matches(
-                                current_userid
-                            ),
-
-                            join_match_number=
-                                matchbatchnumber,
-
-                            initiator_color=
-                                match.initiatedusercolor,
-
-                            show_join_color_modal=True,
-
-                            can_start_match=
-                                can_start_match,
-
-                            should_monitor_match=False
-                        )
-
-                    # -----------------------------------------
-                    # VALID COLORS
-                    # -----------------------------------------
-
-                    allowed_colors = {
-                        "red",
-                        "blue",
-                        "green",
-                        "yellow"
+                        "matchbatchnumber":
+                            matchbatchnumber
                     }
+                )
 
-                    if selected_color not in allowed_colors:
 
-                        flash(
-                            "Please select a valid colour.",
-                            "error"
-                        )
+            return redirect(
+                url_for(
+                    "classic_dashboard"
+                )
+            )
 
-                        return redirect(
-                            url_for("classic_dashboard")
-                        )
 
-                    # -----------------------------------------
-                    # PLAYER 1 COLOR CANNOT BE USED
-                    # -----------------------------------------
+        # ==================================================
+        # READY / NOT READY
+        # ==================================================
 
-                    if selected_color == match.initiatedusercolor:
+        elif action == "ready_match":
 
-                        flash(
-                            "Please select another color. "
-                            "This color is already selected by Player 1.",
-                            "error"
-                        )
+            matchbatchnumber = request.form.get(
+                "matchbatchnumber"
+            )
 
-                        return redirect(
-                            url_for("classic_dashboard")
-                        )
+            ready_value = request.form.get(
+                "ready"
+            )
 
-                    # -----------------------------------------
-                    # ADD SECOND PLAYER
-                    # -----------------------------------------
 
-                    connection.execute(
-                        text("""
-                            UPDATE usersmatches
-                            SET
-                                secondplayeruuid =
-                                    :secondplayeruuid,
-
-                                secondplayeraccepttime =
-                                    NOW(),
-
-                                secondplayercolor =
-                                    :secondplayercolor
-
-                            WHERE matchbatchnumber =
-                                :matchbatchnumber
-
-                            AND secondplayeruuid IS NULL
-
-                            AND matchterminatedbytime = 0
-                        """),
-                        {
-                            "secondplayeruuid":
-                                current_userid,
-
-                            "secondplayercolor":
-                                selected_color,
-
-                            "matchbatchnumber":
-                                matchbatchnumber
-                        }
-                    )
-
-                # Player 2 is now part of a match.
-                # Redirect back to dashboard.
+            if not matchbatchnumber:
 
                 return redirect(
                     url_for(
@@ -864,430 +983,21 @@ def classic_dashboard():
                     )
                 )
 
-            # ==================================================
-            # READY / NOT READY
-            # ==================================================
 
-            elif action == "ready_match":
+            ready = (
+                True
+                if ready_value == "1"
+                else False
+            )
 
-                matchbatchnumber = request.form.get(
-                    "matchbatchnumber"
-                )
-
-                ready_value = request.form.get(
-                    "ready"
-                )
-
-                if not matchbatchnumber:
-
-                    return redirect(
-                        url_for("classic_dashboard")
-                    )
-
-                ready = (
-                    True
-                    if ready_value == "1"
-                    else False
-                )
-
-                with db_engine.begin() as connection:
-
-                    # -----------------------------------------
-                    # GET MATCH
-                    # -----------------------------------------
-
-                    match = connection.execute(
-                        text("""
-                            SELECT
-                                initiateduseruuid,
-                                secondplayeruuid,
-                                user1ready,
-                                user2ready,
-                                matchstarted,
-                                matchterminatedbytime
-                            FROM usersmatches
-                            WHERE matchbatchnumber =
-                                :matchbatchnumber
-                            LIMIT 1
-                        """),
-                        {
-                            "matchbatchnumber":
-                                matchbatchnumber
-                        }
-                    ).fetchone()
-
-                    if not match:
-
-                        flash(
-                            "Match not found.",
-                            "error"
-                        )
-
-                        return redirect(
-                            url_for("classic_dashboard")
-                        )
-
-                    # -----------------------------------------
-                    # CHECK PLAYER
-                    # -----------------------------------------
-
-                    if (
-                        current_userid !=
-                        match.initiateduseruuid
-
-                        and
-
-                        current_userid !=
-                        match.secondplayeruuid
-                    ):
-
-                        flash(
-                            "You are not part of this match.",
-                            "error"
-                        )
-
-                        return redirect(
-                            url_for("classic_dashboard")
-                        )
-
-                    # ==================================================
-                    # TERMINATE OTHER MATCHES
-                    # ONLY WHEN USER CLICKS START
-                    # ==================================================
-
-                    if ready:
-
-                        connection.execute(
-                            text("""
-                                UPDATE usersmatches
-                                SET
-                                    matchterminatedbytime = 1,
-
-                                    terminatedbyother = 1,
-
-                                    terminatedtime = NOW()
-
-                                WHERE
-                                    matchbatchnumber !=
-                                        :currentmatch
-
-                                AND matchterminatedbytime = 0
-
-                                AND (
-                                    initiateduseruuid = :userid
-
-                                    OR
-
-                                    secondplayeruuid = :userid
-                                )
-                            """),
-                            {
-                                "currentmatch":
-                                    matchbatchnumber,
-
-                                "userid":
-                                    current_userid
-                            }
-                        )
-
-                    # -----------------------------------------
-                    # SET PLAYER READY
-                    # -----------------------------------------
-
-                    if (
-                        current_userid ==
-                        match.initiateduseruuid
-                    ):
-
-                        connection.execute(
-                            text("""
-                                UPDATE usersmatches
-                                SET
-                                    user1ready = :ready
-
-                                WHERE matchbatchnumber =
-                                    :matchbatchnumber
-                            """),
-                            {
-                                "ready":
-                                    ready,
-
-                                "matchbatchnumber":
-                                    matchbatchnumber
-                            }
-                        )
-
-                    elif (
-                        current_userid ==
-                        match.secondplayeruuid
-                    ):
-
-                        connection.execute(
-                            text("""
-                                UPDATE usersmatches
-                                SET
-                                    user2ready = :ready
-
-                                WHERE matchbatchnumber =
-                                    :matchbatchnumber
-                            """),
-                            {
-                                "ready":
-                                    ready,
-
-                                "matchbatchnumber":
-                                    matchbatchnumber
-                            }
-                        )
-
-                    # -----------------------------------------
-                    # CHECK BOTH PLAYERS
-                    # -----------------------------------------
-
-                    updated_match = connection.execute(
-                        text("""
-                            SELECT
-                                user1ready,
-                                user2ready
-                            FROM usersmatches
-                            WHERE matchbatchnumber =
-                                :matchbatchnumber
-                        """),
-                        {
-                            "matchbatchnumber":
-                                matchbatchnumber
-                        }
-                    ).fetchone()
-
-                    # ==================================================
-                    # START MATCH
-                    # ==================================================
-
-                    if (
-                        updated_match
-                        and
-                        updated_match.user1ready
-                        and
-                        updated_match.user2ready
-                    ):
-
-                        # -----------------------------------------
-                        # START MATCH + INACTIVITY TIMERS
-                        # -----------------------------------------
-
-                        connection.execute(
-                            text("""
-                                UPDATE usersmatches
-                                SET
-                                    matchstarted = 1,
-
-                                    player1lastmovetime =
-                                        NOW(),
-
-                                    player2lastmovetime =
-                                        NOW()
-
-                                WHERE matchbatchnumber =
-                                    :matchbatchnumber
-                            """),
-                            {
-                                "matchbatchnumber":
-                                    matchbatchnumber
-                            }
-                        )
-
-                        # ==================================================
-                        # INITIALIZE LUDO GAME
-                        # ==================================================
-
-                        existing_game = connection.execute(
-                            text("""
-                                SELECT id
-                                FROM ludogamestate
-                                WHERE matchbatchnumber =
-                                    :matchbatchnumber
-                                LIMIT 1
-                                FOR UPDATE
-                            """),
-                            {
-                                "matchbatchnumber":
-                                    matchbatchnumber
-                            }
-                        ).fetchone()
-
-                        # -----------------------------------------
-                        # CREATE GAME ONLY ONCE
-                        # -----------------------------------------
-
-                        if not existing_game:
-
-                            # -----------------------------------------
-                            # CREATE LUDO GAME STATE
-                            # -----------------------------------------
-
-                            connection.execute(
-                                text("""
-                                    INSERT INTO ludogamestate
-                                    (
-                                        matchbatchnumber,
-                                        currentturnuuid,
-                                        lastdice,
-                                        consecutivesix,
-                                        mustmove
-                                    )
-                                    VALUES
-                                    (
-                                        :matchbatchnumber,
-                                        :currentturnuuid,
-                                        NULL,
-                                        0,
-                                        0
-                                    )
-                                """),
-                                {
-                                    "matchbatchnumber":
-                                        matchbatchnumber,
-
-                                    # Player 1 starts
-                                    "currentturnuuid":
-                                        match.initiateduseruuid
-                                }
-                            )
-
-                            # -----------------------------------------
-                            # CREATE PLAYER 1 COINS
-                            # -----------------------------------------
-
-                            for coinindex in range(1, 5):
-
-                                connection.execute(
-                                    text("""
-                                        INSERT INTO ludocoins
-                                        (
-                                            matchbatchnumber,
-                                            playeruuid,
-                                            coinindex,
-                                            position,
-                                            stepsmoved,
-                                            finished
-                                        )
-                                        VALUES
-                                        (
-                                            :matchbatchnumber,
-                                            :playeruuid,
-                                            :coinindex,
-                                            -1,
-                                            0,
-                                            0
-                                        )
-                                    """),
-                                    {
-                                        "matchbatchnumber":
-                                            matchbatchnumber,
-
-                                        "playeruuid":
-                                            match.initiateduseruuid,
-
-                                        "coinindex":
-                                            coinindex
-                                    }
-                                )
-
-                            # -----------------------------------------
-                            # CREATE PLAYER 2 COINS
-                            # -----------------------------------------
-
-                            for coinindex in range(1, 5):
-
-                                connection.execute(
-                                    text("""
-                                        INSERT INTO ludocoins
-                                        (
-                                            matchbatchnumber,
-                                            playeruuid,
-                                            coinindex,
-                                            position,
-                                            stepsmoved,
-                                            finished
-                                        )
-                                        VALUES
-                                        (
-                                            :matchbatchnumber,
-                                            :playeruuid,
-                                            :coinindex,
-                                            -1,
-                                            0,
-                                            0
-                                        )
-                                    """),
-                                    {
-                                        "matchbatchnumber":
-                                            matchbatchnumber,
-
-                                        "playeruuid":
-                                            match.secondplayeruuid,
-
-                                        "coinindex":
-                                            coinindex
-                                    }
-                                )
-
-                # ==================================================
-                # CHECK MATCH STATE
-                # ==================================================
-
-                with db_engine.begin() as connection:
-
-                    final_match = connection.execute(
-                        text("""
-                            SELECT
-                                matchstarted,
-                                matchterminatedbytime
-                            FROM usersmatches
-                            WHERE matchbatchnumber =
-                                :matchbatchnumber
-                        """),
-                        {
-                            "matchbatchnumber":
-                                matchbatchnumber
-                        }
-                    ).fetchone()
-
-                if (
-                    final_match
-                    and
-                    final_match.matchstarted
-                    and
-                    not final_match.matchterminatedbytime
-                ):
-
-                    return redirect(
-                        url_for("lodo_player_game")
-                    )
-
-                return redirect(
-                    url_for("classic_dashboard")
-                )
-
-        # ==================================================
-        # GET REQUEST
-        # ==================================================
-
-        # -----------------------------------------
-        # READY MATCH FROM URL
-        # -----------------------------------------
-
-        ready_match_number = request.args.get(
-            "ready_match"
-        )
-
-        show_ready_modal = False
-
-        if ready_match_number:
 
             with db_engine.begin() as connection:
 
-                ready_match = connection.execute(
+                # -----------------------------------------
+                # GET MATCH
+                # -----------------------------------------
+
+                match = connection.execute(
                     text("""
                         SELECT
                             matchbatchnumber,
@@ -1297,129 +1007,607 @@ def classic_dashboard():
                             user2ready,
                             matchstarted,
                             matchterminatedbytime
+
                         FROM usersmatches
+
                         WHERE matchbatchnumber =
                             :matchbatchnumber
-                        AND matchterminatedbytime = 0
+
                         LIMIT 1
+
+                        FOR UPDATE
                     """),
                     {
                         "matchbatchnumber":
-                            ready_match_number
+                            matchbatchnumber
                     }
                 ).fetchone()
 
-            if (
-                ready_match
 
-                and
+                # -----------------------------------------
+                # MATCH NOT FOUND
+                # -----------------------------------------
 
-                (
-                    current_userid ==
-                        ready_match.initiateduseruuid
+                if not match:
 
-                    or
+                    flash(
+                        "Match not found.",
+                        "error"
+                    )
 
-                    current_userid ==
-                        ready_match.secondplayeruuid
-                )
+                    return redirect(
+                        url_for(
+                            "classic_dashboard"
+                        )
+                    )
 
-                and
 
-                ready_match.secondplayeruuid is not None
+                # -----------------------------------------
+                # CHECK PLAYER
+                # -----------------------------------------
 
-                and
+                if (
+                    current_userid !=
+                    match.initiateduseruuid
 
-                not ready_match.matchstarted
-            ):
+                    and
 
-                show_ready_modal = True
+                    current_userid !=
+                    match.secondplayeruuid
+                ):
 
-        # ==================================================
-        # AVAILABLE MATCHES
-        # ==================================================
+                    flash(
+                        "You are not part of this match.",
+                        "error"
+                    )
 
-        matches = get_available_matches(
-            current_userid
-        )
+                    return redirect(
+                        url_for(
+                            "classic_dashboard"
+                        )
+                    )
 
-        # ==================================================
-        # DETERMINE WHETHER POLLING IS NEEDED
-        # ==================================================
 
-        with db_engine.begin() as connection:
+                # -----------------------------------------
+                # MATCH ALREADY STARTED
+                # -----------------------------------------
 
-            monitor_match = connection.execute(
-                text("""
-                    SELECT matchbatchnumber
-                    FROM usersmatches
-                    WHERE
-                        matchterminatedbytime = 0
+                if match.matchstarted:
 
-                        AND (
-                            initiateduseruuid = :userid
+                    flash(
+                        "Match has already started.",
+                        "error"
+                    )
 
-                            OR
+                    return redirect(
+                        url_for(
+                            "classic_dashboard"
+                        )
+                    )
 
-                            secondplayeruuid = :userid
+
+                # -----------------------------------------
+                # MATCH TERMINATED
+                # -----------------------------------------
+
+                if match.matchterminatedbytime:
+
+                    flash(
+                        "Match has already ended.",
+                        "error"
+                    )
+
+                    return redirect(
+                        url_for(
+                            "classic_dashboard"
+                        )
+                    )
+
+
+                # ==================================================
+                # PLAYER CLICKED NO
+                # ==================================================
+
+                if not ready:
+
+                    # -----------------------------------------
+                    # PLAYER 2 CLICKS NO
+                    # -----------------------------------------
+
+                    if (
+                        current_userid ==
+                        match.secondplayeruuid
+                    ):
+
+                        connection.execute(
+                            text("""
+                                UPDATE usersmatches
+
+                                SET
+                                    secondplayeruuid = NULL,
+
+                                    secondplayercolor = NULL,
+
+                                    secondplayeraccepttime = NULL,
+
+                                    user2ready = 0
+
+                                WHERE
+                                    matchbatchnumber =
+                                        :matchbatchnumber
+
+                                    AND
+                                    matchstarted = 0
+
+                                    AND
+                                    matchterminatedbytime = 0
+                            """),
+                            {
+                                "matchbatchnumber":
+                                    matchbatchnumber
+                            }
                         )
 
-                        AND secondplayeruuid IS NOT NULL
 
-                        AND matchstarted = 0
+                        return redirect(
+                            url_for(
+                                "classic_dashboard"
+                            )
+                        )
 
-                    ORDER BY matchstarttime DESC
 
-                    LIMIT 1
-                """),
-                {
-                    "userid":
-                        current_userid
-                }
-            ).fetchone()
+                    # -----------------------------------------
+                    # PLAYER 1 CLICKS NO
+                    # -----------------------------------------
 
-        should_monitor_match = (
-            monitor_match is not None
-        )
+                    if (
+                        current_userid ==
+                        match.initiateduseruuid
+                    ):
 
-        # ==================================================
-        # FINAL RENDER
-        # ==================================================
+                        connection.execute(
+                            text("""
+                                UPDATE usersmatches
 
-        return render_template(
-            "classic_dashboard.html",
+                                SET
+                                    secondplayeruuid = NULL,
 
-            balance=balance,
+                                    secondplayercolor = NULL,
 
-            matches=matches,
+                                    secondplayeraccepttime = NULL,
 
-            can_start_match=
-                can_start_match,
+                                    user1ready = 0,
 
-            show_ready_modal=
-                show_ready_modal,
+                                    user2ready = 0
 
-            ready_match_number=
-                ready_match_number,
+                                WHERE
+                                    matchbatchnumber =
+                                        :matchbatchnumber
 
-            should_monitor_match=
-                should_monitor_match
-        )
+                                    AND
+                                    matchstarted = 0
 
-    except Exception:
+                                    AND
+                                    matchterminatedbytime = 0
+                            """),
+                            {
+                                "matchbatchnumber":
+                                    matchbatchnumber
+                            }
+                        )
 
-        flash(
-            "Unable to process your request. Please try again.",
-            "error"
-        )
 
-        return redirect(
-            url_for("classic_dashboard")
-        )
+                        return redirect(
+                            url_for(
+                                "classic_dashboard"
+                            )
+                        )
 
-    finally:
-        pass
 
+                # ==================================================
+                # PLAYER CLICKED START
+                # ==================================================
+
+                if ready:
+
+                    # -----------------------------------------
+                    # TERMINATE OTHER MATCHES
+                    # ONLY WHEN PLAYER CLICKS START
+                    # -----------------------------------------
+
+                    connection.execute(
+                        text("""
+                            UPDATE usersmatches
+
+                            SET
+                                matchterminatedbytime = 1,
+
+                                terminatedbyother = 1,
+
+                                terminatedtime = NOW()
+
+                            WHERE
+                                matchbatchnumber !=
+                                    :currentmatch
+
+                                AND
+                                matchterminatedbytime = 0
+
+                                AND
+                                (
+                                    initiateduseruuid =
+                                        :userid
+
+                                    OR
+
+                                    secondplayeruuid =
+                                        :userid
+                                )
+                        """),
+                        {
+                            "currentmatch":
+                                matchbatchnumber,
+
+                            "userid":
+                                current_userid
+                        }
+                    )
+
+
+                # -----------------------------------------
+                # SET PLAYER READY
+                # -----------------------------------------
+
+                if (
+                    current_userid ==
+                    match.initiateduseruuid
+                ):
+
+                    connection.execute(
+                        text("""
+                            UPDATE usersmatches
+
+                            SET
+                                user1ready = :ready
+
+                            WHERE
+                                matchbatchnumber =
+                                    :matchbatchnumber
+                        """),
+                        {
+                            "ready":
+                                ready,
+
+                            "matchbatchnumber":
+                                matchbatchnumber
+                        }
+                    )
+
+
+                elif (
+                    current_userid ==
+                    match.secondplayeruuid
+                ):
+
+                    connection.execute(
+                        text("""
+                            UPDATE usersmatches
+
+                            SET
+                                user2ready = :ready
+
+                            WHERE
+                                matchbatchnumber =
+                                    :matchbatchnumber
+                        """),
+                        {
+                            "ready":
+                                ready,
+
+                            "matchbatchnumber":
+                                matchbatchnumber
+                        }
+                    )
+
+
+                # -----------------------------------------
+                # CHECK BOTH PLAYERS
+                # -----------------------------------------
+
+                updated_match = connection.execute(
+                    text("""
+                        SELECT
+                            user1ready,
+                            user2ready
+
+                        FROM usersmatches
+
+                        WHERE matchbatchnumber =
+                            :matchbatchnumber
+                    """),
+                    {
+                        "matchbatchnumber":
+                            matchbatchnumber
+                    }
+                ).fetchone()
+
+
+                # ==================================================
+                # START MATCH
+                # ==================================================
+
+                if (
+                    updated_match
+
+                    and
+
+                    updated_match.user1ready
+
+                    and
+
+                    updated_match.user2ready
+                ):
+
+                    # -----------------------------------------
+                    # START MATCH + INACTIVITY TIMERS
+                    # -----------------------------------------
+
+                    connection.execute(
+                        text("""
+                            UPDATE usersmatches
+
+                            SET
+                                matchstarted = 1,
+
+                                player1lastmovetime =
+                                    NOW(),
+
+                                player2lastmovetime =
+                                    NOW()
+
+                            WHERE
+                                matchbatchnumber =
+                                    :matchbatchnumber
+                        """),
+                        {
+                            "matchbatchnumber":
+                                matchbatchnumber
+                        }
+                    )
+
+
+                    # -----------------------------------------
+                    # CHECK GAME ALREADY EXISTS
+                    # -----------------------------------------
+
+                    existing_game = connection.execute(
+                        text("""
+                            SELECT
+                                id
+
+                            FROM ludogamestate
+
+                            WHERE matchbatchnumber =
+                                :matchbatchnumber
+
+                            LIMIT 1
+
+                            FOR UPDATE
+                        """),
+                        {
+                            "matchbatchnumber":
+                                matchbatchnumber
+                        }
+                    ).fetchone()
+
+
+                    # -----------------------------------------
+                    # INITIALIZE GAME ONLY ONCE
+                    # -----------------------------------------
+
+                    if not existing_game:
+
+                        # -----------------------------------------
+                        # CREATE GAME STATE
+                        # -----------------------------------------
+
+                        connection.execute(
+                            text("""
+                                INSERT INTO ludogamestate
+                                (
+                                    matchbatchnumber,
+                                    currentturnuuid,
+                                    lastdice,
+                                    consecutivesix,
+                                    mustmove
+                                )
+
+                                VALUES
+                                (
+                                    :matchbatchnumber,
+                                    :currentturnuuid,
+                                    NULL,
+                                    0,
+                                    0
+                                )
+                            """),
+                            {
+                                "matchbatchnumber":
+                                    matchbatchnumber,
+
+                                "currentturnuuid":
+                                    match.initiateduseruuid
+                            }
+                        )
+
+
+                        # -----------------------------------------
+                        # PLAYER 1 COINS
+                        # -----------------------------------------
+
+                        for coinindex in range(1, 5):
+
+                            connection.execute(
+                                text("""
+                                    INSERT INTO ludocoins
+                                    (
+                                        matchbatchnumber,
+                                        playeruuid,
+                                        coinindex,
+                                        position,
+                                        stepsmoved,
+                                        finished
+                                    )
+
+                                    VALUES
+                                    (
+                                        :matchbatchnumber,
+                                        :playeruuid,
+                                        :coinindex,
+                                        -1,
+                                        0,
+                                        0
+                                    )
+                                """),
+                                {
+                                    "matchbatchnumber":
+                                        matchbatchnumber,
+
+                                    "playeruuid":
+                                        match.initiateduseruuid,
+
+                                    "coinindex":
+                                        coinindex
+                                }
+                            )
+
+
+                        # -----------------------------------------
+                        # PLAYER 2 COINS
+                        # -----------------------------------------
+
+                        for coinindex in range(1, 5):
+
+                            connection.execute(
+                                text("""
+                                    INSERT INTO ludocoins
+                                    (
+                                        matchbatchnumber,
+                                        playeruuid,
+                                        coinindex,
+                                        position,
+                                        stepsmoved,
+                                        finished
+                                    )
+
+                                    VALUES
+                                    (
+                                        :matchbatchnumber,
+                                        :playeruuid,
+                                        :coinindex,
+                                        -1,
+                                        0,
+                                        0
+                                    )
+                                """),
+                                {
+                                    "matchbatchnumber":
+                                        matchbatchnumber,
+
+                                    "playeruuid":
+                                        match.secondplayeruuid,
+
+                                    "coinindex":
+                                        coinindex
+                                }
+                            )
+
+
+            return redirect(
+                url_for(
+                    "classic_dashboard"
+                )
+            )
+
+
+    # ==================================================
+    # GET REQUEST
+    # ==================================================
+
+    with db_engine.begin() as connection:
+
+        # -----------------------------------------
+        # GET ACTIVE MATCH FOR CURRENT USER
+        # -----------------------------------------
+
+        active_match = connection.execute(
+            text("""
+                SELECT
+                    matchbatchnumber,
+                    initiateduseruuid,
+                    secondplayeruuid,
+                    user1ready,
+                    user2ready,
+                    matchstarted,
+                    matchterminatedbytime
+
+                FROM usersmatches
+
+                WHERE
+                    matchterminatedbytime = 0
+
+                    AND
+                    (
+                        initiateduseruuid = :userid
+
+                        OR
+
+                        secondplayeruuid = :userid
+                    )
+
+                ORDER BY matchstarttime DESC
+
+                LIMIT 1
+            """),
+            {
+                "userid":
+                    current_userid
+            }
+        ).fetchone()
+
+
+    # -----------------------------------------
+    # MONITOR MATCH
+    # -----------------------------------------
+
+    should_monitor_match = bool(
+        active_match
+        and
+        active_match.secondplayeruuid
+        and
+        not active_match.matchstarted
+    )
+
+
+    return render_template(
+        "classic_dashboard.html",
+
+        balance=balance,
+
+        matches=get_available_matches(
+            current_userid
+        ),
+
+        can_start_match=
+            can_start_match,
+
+        should_monitor_match=
+            should_monitor_match,
+
+        active_match=
+            active_match
+    )
+    
 @app.route("/match-status/<matchbatchnumber>")
 def match_status(matchbatchnumber):
 
