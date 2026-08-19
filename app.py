@@ -5547,7 +5547,7 @@ def match_timeout_worker():
 
         check_match_timeouts()
 
-        time.sleep(60)
+        time.sleep(300)
 
 
 initialize_database()
