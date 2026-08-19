@@ -1,0 +1,188 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html,
+body{
+    width:100%;
+    height:100%;
+    font-family:Arial, Helvetica, sans-serif;
+    background:#f5f7fb;
+}
+
+body{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+/* Main Container */
+
+.signup-container{
+    width:100%;
+    max-width:420px;
+    min-height:580px;
+
+    background:#ffffff;
+
+    border-radius:24px;
+
+    box-shadow:0 12px 35px rgba(0,0,0,0.12);
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+
+    padding:40px 25px;
+}
+
+/* Logo */
+
+.logo-section{
+    width:100%;
+    display:flex;
+    justify-content:center;
+    margin-top:10px;
+    margin-bottom:60px;
+}
+
+.logo-section img{
+    width:140px;
+    height:auto;
+    object-fit:contain;
+}
+
+/* Form */
+
+.signup-form{
+    width:100%;
+}
+
+/* Heading */
+
+.input-title{
+    font-size:16px;
+    font-weight:600;
+    color:#333;
+    margin-bottom:15px;
+    text-align:left;
+}
+
+/* Input Fields */
+
+.signup-form input{
+    width:100%;
+    height:55px;
+
+    border:2px solid #d9d9d9;
+    border-radius:14px;
+
+    outline:none;
+
+    padding:0 18px;
+
+    font-size:16px;
+
+    margin-bottom:18px;
+
+    transition:.3s;
+}
+
+.signup-form input:focus{
+    border-color:#2d7cff;
+}
+
+/* Submit Button */
+
+.submit-btn{
+    width:100%;
+    height:50px;
+
+    margin-top:10px;
+
+    border:none;
+    border-radius:14px;
+
+    background:#2d7cff;
+    color:#ffffff;
+
+    font-size:16px;
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.3s;
+}
+
+.submit-btn:hover{
+    background:#1f66dc;
+}
+
+.submit-btn:active{
+    transform:scale(0.98);
+}
+
+.success-message{
+    margin-top:15px;
+
+    color:#28a745;
+
+    font-size:15px;
+    font-weight:600;
+
+    text-align:center;
+}
+
+.back-login-btn{
+
+    width:55px;
+    height:55px;
+
+    margin:20px auto 0;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:#2d7cff;
+
+    color:#ffffff;
+
+    cursor:pointer;
+
+    transition:0.3s;
+
+    box-shadow:0 8px 20px rgba(45,124,255,0.30);
+
+}
+
+.back-login-btn:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 12px 25px rgba(45,124,255,0.40);
+
+}
+
+.back-login-btn:active{
+
+    transform:scale(0.95);
+
+}
+
+.back-icon{
+
+    font-size:24px;
+
+    font-weight:bold;
+
+    line-height:1;
+
+}

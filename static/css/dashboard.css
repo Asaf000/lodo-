@@ -1,0 +1,358 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+html,
+body {
+    width: 100%;
+    min-height: 100vh;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    background: #f5f7fb;
+}
+
+
+body {
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    min-height: 100vh;
+
+    padding: 25px 15px;
+}
+
+
+/* =====================================
+   DASHBOARD
+===================================== */
+
+.dashboard-container {
+
+    width: 100%;
+
+    max-width: 430px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 20px;
+}
+
+
+/* =====================================
+   GAME CARD
+===================================== */
+
+.game-card {
+
+    width: 100%;
+
+    background: #ffffff;
+
+    border-radius: 20px;
+
+    padding: 18px;
+
+    box-shadow:
+        0 10px 25px rgba(0, 0, 0, 0.10);
+}
+
+
+/* =====================================
+   GAME BUTTON
+===================================== */
+
+.game-btn {
+
+    width: 100%;
+
+    min-height: 250px;
+
+    border: none;
+
+    border-radius: 14px;
+
+    background: transparent;
+
+    cursor: pointer;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 12px;
+
+    padding: 15px;
+
+    transition: 0.3s;
+}
+
+
+.game-btn:hover {
+
+    background: #f5f7fb;
+}
+
+
+.game-btn:active {
+
+    transform: scale(0.98);
+}
+
+
+/* =====================================
+   GAME IMAGE
+===================================== */
+
+.game-image {
+
+    width: 180px;
+
+    height: 180px;
+
+    object-fit: contain;
+
+    display: block;
+}
+
+
+/* =====================================
+   GAME TITLE
+===================================== */
+
+.game-title {
+
+    font-size: 20px;
+
+    font-weight: 700;
+
+    color: #172033;
+
+    text-align: center;
+
+    display: block;
+}
+
+
+/* =====================================
+   POPUP OVERLAY
+===================================== */
+
+.popup-overlay {
+
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background: rgba(0, 0, 0, 0.45);
+
+    display: none;
+
+    justify-content: center;
+    align-items: center;
+
+    z-index: 999;
+}
+
+
+/* =====================================
+   POPUP BOX
+===================================== */
+
+.popup-box {
+
+    width: 90%;
+
+    max-width: 320px;
+
+    background: #ffffff;
+
+    border-radius: 18px;
+
+    padding: 35px 20px;
+
+    position: relative;
+
+    text-align: center;
+
+    box-shadow:
+        0 15px 35px rgba(0, 0, 0, 0.25);
+}
+
+
+.popup-box h2 {
+
+    font-size: 22px;
+
+    color: #333;
+}
+
+
+/* =====================================
+   CLOSE BUTTON
+===================================== */
+
+.close-btn {
+
+    position: absolute;
+
+    top: 12px;
+    right: 12px;
+
+    width: 35px;
+    height: 35px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: #f2f2f2;
+
+    color: #555;
+
+    font-size: 22px;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+
+.close-btn:hover {
+
+    background: #e0e0e0;
+}
+
+
+/* =====================================
+   MOBILE
+===================================== */
+
+@media (max-width: 500px) {
+
+    body {
+
+        padding: 20px 12px;
+
+        align-items: flex-start;
+    }
+
+
+    .dashboard-container {
+
+        max-width: 430px;
+
+        margin-top: 20px;
+
+        gap: 18px;
+    }
+
+
+    .game-card {
+
+        padding: 14px;
+
+        border-radius: 18px;
+    }
+
+
+    .game-btn {
+
+        min-height: 230px;
+
+        padding: 10px;
+    }
+
+
+    .game-image {
+
+        width: 160px;
+
+        height: 160px;
+    }
+
+
+    .game-title {
+
+        font-size: 19px;
+    }
+}
+
+/* =====================================
+   SUPPORT CARD
+===================================== */
+
+.support-card {
+
+    width: 100%;
+
+    background: #ffffff;
+
+    border-radius: 20px;
+
+    padding: 22px 20px;
+
+    text-align: center;
+
+    box-shadow:
+        0 10px 25px rgba(0, 0, 0, 0.10);
+}
+
+
+.support-card h2 {
+
+    font-size: 21px;
+
+    font-weight: 700;
+
+    color: #172033;
+
+    margin-bottom: 12px;
+}
+
+
+.support-details {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 5px;
+}
+
+
+.support-label {
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    color: #555;
+}
+
+
+.support-number {
+
+    font-size: 16px;
+
+    font-weight: 600;
+
+    color: #172033;
+}
