@@ -1,0 +1,2025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ludo Exact Coordinate Calibration</title>
+<style>
+/* =========================================
+   GLOBAL
+========================================= */
+
+* {
+
+    margin: 0;
+
+    padding: 0;
+
+    box-sizing: border-box;
+
+}
+
+
+html,
+body {
+
+    width: 100%;
+
+    min-height: 100%;
+
+}
+
+
+body {
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background:
+        radial-gradient(
+            circle at top,
+            #4b0082,
+            #1a0033
+        );
+
+    color: #ffffff;
+
+    min-height: 100vh;
+
+    overflow-x: hidden;
+
+}
+
+
+/* =========================================
+   NAVBAR
+========================================= */
+
+.game-navbar {
+
+    width: 100%;
+
+    height: 70px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding:
+        0 25px;
+
+    background:
+        rgba(0,0,0,0.35);
+
+    backdrop-filter:
+        blur(12px);
+
+    border-bottom:
+        2px solid #b8860b;
+
+    box-shadow:
+        0 3px 15px
+        rgba(0,0,0,0.35);
+
+    position: relative;
+
+    z-index: 1000;
+
+}
+
+
+/* =========================================
+   LOGO
+========================================= */
+
+.logo-section {
+
+    display: flex;
+
+    align-items: center;
+
+}
+
+
+.game-logo {
+
+    height: 45px;
+
+    width: auto;
+
+    display: block;
+
+}
+
+
+/* =========================================
+   EXIT BUTTON
+========================================= */
+
+.exit-match-btn {
+
+    border: none;
+
+    background:
+        linear-gradient(
+            145deg,
+            #d62828,
+            #a31515
+        );
+
+    color: #ffffff;
+
+    padding:
+        11px 20px;
+
+    border-radius:
+        8px;
+
+    font-size:
+        15px;
+
+    font-weight:
+        700;
+
+    cursor:
+        pointer;
+
+    transition:
+        0.2s ease;
+
+}
+
+
+.exit-match-btn:hover {
+
+    transform:
+        scale(1.04);
+
+    box-shadow:
+        0 0 15px
+        rgba(255,0,0,0.45);
+
+}
+
+
+.exit-match-btn:active {
+
+    transform:
+        scale(0.97);
+
+}
+
+
+/* =========================================
+   MAIN AREA
+========================================= */
+
+.game-main {
+
+    width: 100%;
+
+    min-height:
+        calc(100vh - 70px);
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: flex-start;
+
+    padding:
+        20px 10px 50px;
+
+}
+
+
+/* =========================================
+   GAME CONTAINER
+========================================= */
+
+.game-container {
+
+    width: 100%;
+
+    max-width: 750px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+}
+
+
+/* =========================================
+   MATCH INFO
+========================================= */
+
+.match-info-card {
+
+    width: 96%;
+
+    max-width: 650px;
+
+    display: flex;
+
+    justify-content:
+        space-around;
+
+    align-items: center;
+
+    gap: 10px;
+
+    flex-wrap: wrap;
+
+    padding:
+        13px 15px;
+
+    margin-bottom: 10px;
+
+    background:
+        rgba(0,0,0,0.35);
+
+    backdrop-filter:
+        blur(10px);
+
+    border:
+        2px solid #b8860b;
+
+    border-radius:
+        15px;
+
+    box-shadow:
+        0 8px 25px
+        rgba(0,0,0,0.4);
+
+}
+
+
+.match-info-item {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 4px;
+
+}
+
+
+.match-info-item span {
+
+    font-size:
+        11px;
+
+    opacity:
+        0.75;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        0.5px;
+
+}
+
+
+.match-info-item strong {
+
+    font-size:
+        14px;
+
+}
+
+
+/* =========================================
+   COLOR NAMES
+========================================= */
+
+.color-name.green {
+
+    color:
+        #66bb6a;
+
+}
+
+
+.color-name.red {
+
+    color:
+        #ff5252;
+
+}
+
+
+.color-name.yellow {
+
+    color:
+        #fff176;
+
+}
+
+
+.color-name.blue {
+
+    color:
+        #29b6f6;
+
+}
+
+
+/* =========================================
+   PLAYERS CARD
+========================================= */
+
+.players-card {
+
+    width: 96%;
+
+    max-width: 650px;
+
+    padding:
+        12px 18px;
+
+    margin-bottom:
+        12px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content:
+        space-between;
+
+    gap: 15px;
+
+    background:
+        rgba(0,0,0,0.35);
+
+    backdrop-filter:
+        blur(10px);
+
+    border:
+        2px solid #b8860b;
+
+    border-radius:
+        18px;
+
+    box-shadow:
+        0 8px 25px
+        rgba(0,0,0,0.4);
+
+}
+
+
+.player-display {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+}
+
+
+.player-display-text {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 2px;
+
+}
+
+
+.player-display-text strong {
+
+    font-size:
+        14px;
+
+}
+
+
+.player-label {
+
+    font-size:
+        10px;
+
+    opacity:
+        0.65;
+
+    text-transform:
+        uppercase;
+
+}
+
+
+.player-color-dot {
+
+    width:
+        28px;
+
+    height:
+        28px;
+
+    border-radius:
+        50%;
+
+    border:
+        2px solid #ffffff;
+
+    box-shadow:
+        0 0 8px
+        rgba(0,0,0,0.5);
+
+}
+
+
+.player-color-dot.green {
+
+    background:
+        #2e7d32;
+
+}
+
+
+.player-color-dot.red {
+
+    background:
+        #c62828;
+
+}
+
+
+.player-color-dot.yellow {
+
+    background:
+        #f9a825;
+
+}
+
+
+.player-color-dot.blue {
+
+    background:
+        #1565c0;
+
+}
+
+
+/* =========================================
+   TURN
+========================================= */
+
+.turn-display {
+
+    text-align:
+        center;
+
+    font-size:
+        18px;
+
+    font-weight:
+        700;
+
+    color:
+        #ffd700;
+
+}
+
+
+.turn-timer {
+
+    font-size:
+        11px;
+
+    text-align:
+        center;
+
+    opacity:
+        0.7;
+
+}
+
+
+.countdown {
+
+    font-size:
+        15px;
+
+    font-weight:
+        700;
+
+    color:
+        #ffd700;
+
+    text-align:
+        center;
+
+}
+
+
+/* =========================================
+   LUDO BOARD
+========================================= */
+
+.game {
+
+    border:
+        3px solid #b8860b;
+
+    position:
+        relative;
+
+    width:
+        92vw;
+
+    max-width:
+        620px;
+
+    aspect-ratio:
+        1 / 1;
+
+    background-color:
+        #d7d7d7;
+
+    box-shadow:
+        0 15px 40px
+        rgba(0,0,0,0.6);
+
+    border-radius:
+        12px;
+
+    overflow:
+        hidden;
+
+}
+
+
+.game * {
+
+    box-sizing:
+        border-box;
+
+}
+
+
+/* =========================================
+   HOUSES
+========================================= */
+
+.house {
+
+    display:
+        inline-block;
+
+    position:
+        absolute;
+
+    width:
+        40%;
+
+    height:
+        40%;
+
+    padding:
+        7%;
+
+}
+
+
+/* =========================================
+   FIXED HOUSE POSITIONS
+
+   The positions never change:
+   USER 1  -> bottom-left
+   USER 2  -> top-right
+   Remaining colors -> top-left / bottom-right
+========================================= */
+
+#houseTopLeft {
+    top: 0;
+    left: 0;
+}
+
+#houseTopRight {
+    top: 0;
+    right: 0;
+}
+
+#houseBottomLeft {
+    bottom: 0;
+    left: 0;
+}
+
+#houseBottomRight {
+    bottom: 0;
+    right: 0;
+}
+
+
+/* =========================================
+   HOUSE BOX
+========================================= */
+
+.box {
+
+    position:
+        relative;
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    background:
+        rgb(251,251,251);
+
+    padding:
+        20%;
+
+}
+
+
+/* =========================================
+   HOUSE SQUARES
+========================================= */
+
+.square {
+
+    position:
+        absolute;
+
+    width:
+        25%;
+
+    height:
+        25%;
+
+    border-radius:
+        50%;
+
+    border:
+        2px solid white;
+
+    box-shadow:
+        0 2px 7px
+        rgba(0,0,0,0.35);
+
+}
+
+
+.square-one {
+
+    top:
+        20%;
+
+    left:
+        20%;
+
+}
+
+
+.square-two {
+
+    top:
+        20%;
+
+    right:
+        20%;
+
+}
+
+
+.square-three {
+
+    bottom:
+        20%;
+
+    left:
+        20%;
+
+}
+
+
+.square-four {
+
+    bottom:
+        20%;
+
+    right:
+        20%;
+
+}
+
+
+/* =========================================
+   HOUSE COLORS
+========================================= */
+
+.house-green {
+
+    background:
+        #66bb6a;
+
+}
+
+
+.house-red {
+
+    background:
+        #e53935;
+
+}
+
+
+.house-yellow {
+
+    background:
+        #fff176;
+
+}
+
+
+.house-blue {
+
+    background:
+        #29b6f6;
+
+}
+
+
+/* =========================================
+   SQUARE COLORS
+========================================= */
+
+.square-green {
+
+    background:
+        #2e7d32;
+
+}
+
+
+.square-red {
+
+    background:
+        #c62828;
+
+}
+
+
+.square-yellow {
+
+    background:
+        #f9a825;
+
+}
+
+
+.square-blue {
+
+    background:
+        #1565c0;
+
+}
+
+
+/* =========================================
+   CENTER HOME
+========================================= */
+
+.home {
+
+    position:
+        absolute;
+
+    top:
+        40%;
+
+    left:
+        40%;
+
+    width:
+        20%;
+
+    height:
+        20%;
+
+    border-top:
+        20px solid var(--board-top-color);
+
+    border-bottom:
+        20px solid var(--board-bottom-color);
+
+    border-left:
+        20px solid var(--board-left-color);
+
+    border-right:
+        20px solid var(--board-right-color);
+
+    background:
+        transparent;
+
+}
+
+
+/* =========================================
+   BOARD CELLS
+========================================= */
+
+.cells {
+
+    position:
+        absolute;
+
+    width:
+        6.6667%;
+
+    height:
+        6.6667%;
+
+    border:
+        1px solid
+        rgba(9,9,9,0.41);
+
+    background:
+        rgb(251,251,251);
+
+}
+
+
+.cell-green {
+
+    background:
+        var(--board-left-color) !important;
+
+    border:
+        none !important;
+
+}
+
+
+.cell-red {
+
+    background:
+        var(--board-bottom-color) !important;
+
+    border:
+        none !important;
+
+}
+
+
+.cell-yellow {
+
+    background:
+        var(--board-top-color) !important;
+
+    border:
+        none !important;
+
+}
+
+
+.cell-blue {
+
+    background:
+        var(--board-right-color) !important;
+
+    border:
+        none !important;
+
+}
+
+
+/* =========================================
+   SAFE CELLS
+========================================= */
+
+.safe {
+
+    background:
+        #f9f7f7 !important;
+
+    clip-path:
+        polygon(
+            50% 0%,
+            61% 35%,
+            98% 35%,
+            68% 57%,
+            79% 91%,
+            50% 70%,
+            21% 91%,
+            32% 57%,
+            2% 35%,
+            39% 35%
+        );
+
+}
+
+
+/* =========================================
+   START CELLS
+========================================= */
+
+.g-start,
+.y-start,
+.r-start,
+.b-start {
+
+    clip-path:
+        polygon(
+            20% 0%,
+            0% 20%,
+            30% 50%,
+            0% 80%,
+            20% 100%,
+            50% 70%,
+            80% 100%,
+            100% 80%,
+            70% 50%,
+            100% 20%,
+            80% 0%,
+            50% 30%
+        );
+
+}
+
+
+.g-start {
+
+    background:
+        var(--board-left-color) !important;
+
+}
+
+
+.y-start {
+
+    background:
+        var(--board-top-color) !important;
+
+}
+
+
+.r-start {
+
+    background:
+        var(--board-bottom-color) !important;
+
+}
+
+
+.b-start {
+
+    background:
+        var(--board-right-color) !important;
+
+}
+
+
+/* =========================================
+   ARROWS
+========================================= */
+
+.arrow {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    font-size:
+        x-large;
+
+    color:
+        #ffffff;
+
+    background:
+        rgb(251,251,251) !important;
+
+}
+
+
+/* =========================================
+   COINS
+========================================= */
+
+.coin {
+
+    width:
+        28px;
+
+    height:
+        28px;
+
+    border-radius:
+        50%;
+
+    position:
+        absolute;
+
+    cursor:
+        pointer;
+
+    z-index:
+        999;
+
+    border:
+        2px solid #ffffff;
+
+    box-shadow:
+        0 2px 8px
+        rgba(0,0,0,0.4);
+
+    transition:
+        top 0.25s ease,
+        left 0.25s ease,
+        width 0.2s ease,
+        height 0.2s ease;
+
+}
+
+
+/* =========================================
+   INITIAL COIN HOME POSITIONS
+
+   Player 1 is always bottom-left.
+   Player 2 is always top-right.
+   Their actual colors are assigned by JS.
+========================================= */
+
+.coin {
+    width: 6.5%;
+    height: 6.5%;
+    transform: translate(-50%, -50%);
+}
+
+#player-coin-1 { left: 13%; top: 73%; }
+#player-coin-2 { left: 27%; top: 73%; }
+#player-coin-3 { left: 13%; top: 87%; }
+#player-coin-4 { left: 27%; top: 87%; }
+
+#opponent-coin-1 { left: 73%; top: 13%; }
+#opponent-coin-2 { left: 87%; top: 13%; }
+#opponent-coin-3 { left: 73%; top: 27%; }
+#opponent-coin-4 { left: 87%; top: 27%; }
+
+
+.coin-green {
+
+    background:
+        #2e7d32;
+
+}
+
+
+.coin-red {
+
+    background:
+        #c62828;
+
+}
+
+
+.coin-yellow {
+
+    background:
+        #f9a825;
+
+}
+
+
+.coin-blue {
+
+    background:
+        #1565c0;
+
+}
+
+
+/* =========================================
+   DICE
+========================================= */
+
+.dice-wrapper {
+
+    margin-top:
+        20px;
+
+    display:
+        flex;
+
+    justify-content:
+        center;
+
+    align-items:
+        center;
+
+}
+
+
+.dice-box {
+
+    width:
+        105px;
+
+    height:
+        115px;
+
+    border:
+        3px solid #b8860b;
+
+    border-radius:
+        20px;
+
+    background:
+        #3b1466;
+
+    box-shadow:
+        0 12px 30px
+        rgba(0,0,0,0.55);
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    justify-content:
+        center;
+
+    align-items:
+        center;
+
+    cursor:
+        pointer;
+
+    color:
+        #ffffff;
+
+    transition:
+        0.2s ease;
+
+}
+
+
+.dice-box:hover {
+
+    transform:
+        scale(1.05);
+
+}
+
+
+.dice-box:disabled {
+
+    opacity:
+        0.45;
+
+    cursor:
+        not-allowed;
+
+    transform:
+        none;
+
+}
+
+
+.dice-number {
+
+    font-size:
+        38px;
+
+    font-weight:
+        700;
+
+    color:
+        #ffd700;
+
+}
+
+
+.dice-icon {
+
+    font-size:
+        34px;
+
+    margin-top:
+        5px;
+
+}
+
+
+/* =========================================
+   GAME MESSAGE
+========================================= */
+
+.game-message {
+
+    margin-top:
+        12px;
+
+    padding:
+        10px 18px;
+
+    text-align:
+        center;
+
+    font-size:
+        14px;
+
+    font-weight:
+        600;
+
+    color:
+        #ffd700;
+
+}
+
+
+/* =========================================
+   EXIT MODAL
+========================================= */
+
+.exit-modal-overlay {
+
+    position:
+        fixed;
+
+    inset:
+        0;
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    background:
+        rgba(0,0,0,0.65);
+
+    display:
+        none;
+
+    justify-content:
+        center;
+
+    align-items:
+        center;
+
+    z-index:
+        9999;
+
+    padding:
+        20px;
+
+}
+
+
+.exit-modal {
+
+    width:
+        100%;
+
+    max-width:
+        400px;
+
+    background:
+        #ffffff;
+
+    color:
+        #222222;
+
+    border-radius:
+        15px;
+
+    padding:
+        30px;
+
+    text-align:
+        center;
+
+    box-shadow:
+        0 10px 40px
+        rgba(0,0,0,0.4);
+
+    animation:
+        exitModalIn
+        0.18s ease;
+
+}
+
+
+@keyframes exitModalIn {
+
+    from {
+
+        opacity:
+            0;
+
+        transform:
+            scale(0.95)
+            translateY(10px);
+
+    }
+
+    to {
+
+        opacity:
+            1;
+
+        transform:
+            scale(1)
+            translateY(0);
+
+    }
+
+}
+
+
+.exit-modal h2 {
+
+    margin-bottom:
+        15px;
+
+    font-size:
+        23px;
+
+}
+
+
+.exit-modal p {
+
+    margin-bottom:
+        25px;
+
+    line-height:
+        1.5;
+
+    font-size:
+        15px;
+
+    color:
+        #555555;
+
+}
+
+
+/* =========================================
+   EXIT BUTTON AREA
+========================================= */
+
+.exit-buttons {
+
+    display:
+        flex;
+
+    gap:
+        12px;
+
+    justify-content:
+        center;
+
+    width:
+        100%;
+
+}
+
+
+.exit-confirm-btn,
+.continue-game-btn {
+
+    border:
+        none;
+
+    min-height:
+        44px;
+
+    padding:
+        12px 20px;
+
+    border-radius:
+        8px;
+
+    font-size:
+        15px;
+
+    font-weight:
+        700;
+
+    cursor:
+        pointer;
+
+}
+
+
+.exit-confirm-btn {
+
+    background:
+        #d62828;
+
+    color:
+        #ffffff;
+
+}
+
+
+.exit-confirm-btn:hover {
+
+    background:
+        #b71c1c;
+
+}
+
+
+.continue-game-btn {
+
+    background:
+        #e5e5e5;
+
+    color:
+        #222222;
+
+}
+
+
+.continue-game-btn:hover {
+
+    background:
+        #d5d5d5;
+
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 768px) {
+
+    .game-navbar {
+
+        height:
+            60px;
+
+        padding:
+            0 14px;
+
+    }
+
+
+    .game-logo {
+
+        height:
+            37px;
+
+    }
+
+
+    .exit-match-btn {
+
+        padding:
+            9px 13px;
+
+        font-size:
+            13px;
+
+    }
+
+
+    .game-main {
+
+        min-height:
+            calc(100vh - 60px);
+
+        padding:
+            12px 5px 35px;
+
+    }
+
+
+    .match-info-card {
+
+        width:
+            98%;
+
+        padding:
+            10px 7px;
+
+    }
+
+
+    .match-info-item span {
+
+        font-size:
+            9px;
+
+    }
+
+
+    .match-info-item strong {
+
+        font-size:
+            12px;
+
+    }
+
+
+    .players-card {
+
+        width:
+            98%;
+
+        padding:
+            10px;
+
+        gap:
+            7px;
+
+    }
+
+
+    .player-color-dot {
+
+        width:
+            23px;
+
+        height:
+            23px;
+
+    }
+
+
+    .player-display-text strong {
+
+        font-size:
+            11px;
+
+    }
+
+
+    .player-label {
+
+        font-size:
+            8px;
+
+    }
+
+
+    .turn-display {
+
+        font-size:
+            14px;
+
+    }
+
+
+    .countdown {
+
+        font-size:
+            12px;
+
+    }
+
+
+    .game {
+
+        width:
+            97vw;
+
+        max-width:
+            none;
+
+        margin-top:
+            8px;
+
+    }
+
+
+    .coin {
+
+        width:
+            23px;
+
+        height:
+            23px;
+
+    }
+
+
+    .dice-wrapper {
+
+        margin-top:
+            15px;
+
+    }
+
+
+    .dice-box {
+
+        width:
+            90px;
+
+        height:
+            100px;
+
+    }
+
+
+    .dice-number {
+
+        font-size:
+            32px;
+
+    }
+
+
+    .dice-icon {
+
+        font-size:
+            28px;
+
+    }
+
+
+    .game-message {
+
+        font-size:
+            12px;
+
+    }
+
+
+    .exit-buttons {
+
+        flex-direction:
+            column;
+
+    }
+
+
+    .exit-confirm-btn,
+    .continue-game-btn {
+
+        width:
+            100%;
+
+    }
+
+
+}
+
+
+/* =========================================
+   VERY SMALL PHONES
+========================================= */
+
+@media (max-width: 380px) {
+
+    .game-navbar {
+
+        padding:
+            0 10px;
+
+    }
+
+
+    .game-logo {
+
+        height:
+            34px;
+
+    }
+
+
+    .exit-match-btn {
+
+        padding:
+            8px 11px;
+
+        font-size:
+            12px;
+
+    }
+
+
+    .game {
+
+        width:
+            98vw;
+
+    }
+
+
+    .coin {
+
+        width:
+            20px;
+
+        height:
+            20px;
+
+    }
+
+
+    .players-card {
+
+        padding:
+            8px 5px;
+
+    }
+
+
+    .player-display {
+
+        gap:
+            5px;
+
+    }
+
+
+    .player-display-text strong {
+
+        font-size:
+            10px;
+
+    }
+
+}
+html,body{margin:0;min-height:100%;}
+body{background:#171717;color:#fff;padding:24px;font-family:Arial,Helvetica,sans-serif;}
+.calibration-wrap{width:100%;display:flex;flex-direction:column;align-items:center;gap:18px;}
+.calibration-title{text-align:center;}
+.calibration-title h1{margin:0 0 6px;font-size:24px;}
+.calibration-title p{margin:0;color:#bbb;font-size:14px;}
+.board-container{position:relative;}
+#ludoBoard .cells{cursor:crosshair;}
+.calibration-panel{width:min(92vw,620px);background:#222;border:1px solid #555;border-radius:12px;padding:16px;}
+.coord-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;}
+.coord-box{background:#111;border-radius:8px;padding:10px;}
+.coord-label{display:block;color:#999;font-size:10px;text-transform:uppercase;margin-bottom:5px;}
+.coord-value{font-family:Consolas,monospace;font-size:14px;word-break:break-all;}
+#info{margin-top:12px;color:#ffd700;font-weight:700;font-size:14px;}
+button{margin-top:12px;padding:9px 14px;border:0;border-radius:7px;cursor:pointer;font-weight:700;}
+#calibrationMarker{position:absolute;width:18px;height:18px;border:3px solid #fff;border-radius:50%;background:rgba(255,215,0,.35);transform:translate(-50%,-50%);pointer-events:none;z-index:10000;display:none;}
+@media(max-width:700px){body{padding:12px 5px;}.coord-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+</style>
+</head>
+<body>
+<div class="calibration-wrap">
+<div class="calibration-title">
+<h1>Exact Ludo Board Coordinates</h1>
+<p>Click a movement box. Use the <b>Coin Top / Left</b> value in your real game.</p>
+</div>
+<div class="board-container">
+<div class="game" id="ludoBoard">
+<!-- =================================
+                     TOP LEFT HOUSE
+                     UNUSED COLOR
+                ================================== -->
+<div class="house" id="houseTopLeft">
+<div class="box">
+<div class="square square-one"></div>
+<div class="square square-two"></div>
+<div class="square square-three"></div>
+<div class="square square-four"></div>
+</div>
+</div>
+<!-- =================================
+                     TOP RIGHT HOUSE
+                     PLAYER 2
+                ================================== -->
+<div class="house" id="houseTopRight">
+<div class="box">
+<div class="square square-one"></div>
+<div class="square square-two"></div>
+<div class="square square-three"></div>
+<div class="square square-four"></div>
+</div>
+</div>
+<!-- =================================
+                     BOTTOM LEFT HOUSE
+                     PLAYER 1
+                ================================== -->
+<div class="house" id="houseBottomLeft">
+<div class="box">
+<div class="square square-one"></div>
+<div class="square square-two"></div>
+<div class="square square-three"></div>
+<div class="square square-four"></div>
+</div>
+</div>
+<!-- =================================
+                     BOTTOM RIGHT HOUSE
+                     UNUSED COLOR
+                ================================== -->
+<div class="house" id="houseBottomRight">
+<div class="box">
+<div class="square square-one"></div>
+<div class="square square-two"></div>
+<div class="square square-three"></div>
+<div class="square square-four"></div>
+</div>
+</div>
+<!-- =================================
+                     CENTER HOME
+                ================================== -->
+<div class="home"></div>
+<!-- =================================
+                     TOP LEFT HORIZONTAL PATH
+                ================================== -->
+<div class="cells" style="top:40%;left:0;"></div>
+<div class="cells g-start" style="top:40%;left:6.66%;"></div>
+<div class="cells" style="top:40%;left:13.32%;"></div>
+<div class="cells" style="top:40%;left:19.98%;"></div>
+<div class="cells" style="top:40%;left:26.64%;"></div>
+<div class="cells" style="top:40%;left:33.3%;"></div>
+<!-- =================================
+                     TOP VERTICAL PATH
+                ================================== -->
+<div class="cells" style="top:0;left:40%;"></div>
+<div class="cells" style="top:6.66%;left:40%;"></div>
+<div class="cells safe" style="top:13.32%;left:40%;"></div>
+<div class="cells" style="top:19.98%;left:40%;"></div>
+<div class="cells" style="top:26.64%;left:40%;"></div>
+<div class="cells" style="top:33.3%;left:40%;"></div>
+<!-- =================================
+                     YELLOW HOME LANE
+                ================================== -->
+<div class="cells arrow" style="top:0;left:46.66%;">
+                    ↓
+                </div>
+<div class="cells cell-yellow" style="top:6.66%;left:46.66%;"></div>
+<div class="cells cell-yellow" style="top:13.32%;left:46.66%;"></div>
+<div class="cells cell-yellow" style="top:19.98%;left:46.66%;"></div>
+<div class="cells cell-yellow" style="top:26.64%;left:46.66%;"></div>
+<div class="cells cell-yellow" style="top:33.3%;left:46.66%;"></div>
+<!-- =================================
+                     TOP RIGHT VERTICAL PATH
+                ================================== -->
+<div class="cells" style="top:0;left:53.32%;"></div>
+<div class="cells y-start" style="top:6.66%;left:53.32%;"></div>
+<div class="cells" style="top:13.32%;left:53.32%;"></div>
+<div class="cells" style="top:19.98%;left:53.32%;"></div>
+<div class="cells" style="top:26.64%;left:53.32%;"></div>
+<div class="cells" style="top:33.3%;left:53.32%;"></div>
+<!-- =================================
+                     TOP RIGHT HORIZONTAL PATH
+                ================================== -->
+<div class="cells" style="top:40%;right:33.3%;"></div>
+<div class="cells" style="top:40%;right:26.64%;"></div>
+<div class="cells" style="top:40%;right:19.98%;"></div>
+<div class="cells safe" style="top:40%;right:13.32%;"></div>
+<div class="cells" style="top:40%;right:6.66%;"></div>
+<div class="cells" style="top:40%;right:0;"></div>
+<!-- =================================
+                     BLUE HOME LANE
+                ================================== -->
+<div class="cells cell-blue" style="top:46.66%;right:33.3%;"></div>
+<div class="cells cell-blue" style="top:46.66%;right:26.64%;"></div>
+<div class="cells cell-blue" style="top:46.66%;right:19.98%;"></div>
+<div class="cells cell-blue" style="top:46.66%;right:13.32%;"></div>
+<div class="cells cell-blue" style="top:46.66%;right:6.66%;"></div>
+<div class="cells arrow" style="top:46.66%;right:0;">
+                    ←
+                </div>
+<!-- =================================
+                     RIGHT LOWER PATH
+                ================================== -->
+<div class="cells" style="top:53.32%;right:33.3%;"></div>
+<div class="cells" style="top:53.32%;right:26.64%;"></div>
+<div class="cells" style="top:53.32%;right:19.98%;"></div>
+<div class="cells" style="top:53.32%;right:13.32%;"></div>
+<div class="cells b-start" style="top:53.32%;right:6.66%;"></div>
+<div class="cells" style="top:53.32%;right:0;"></div>
+<!-- =================================
+                     BOTTOM RIGHT VERTICAL PATH
+                ================================== -->
+<div class="cells" style="bottom:0;left:53.32%;"></div>
+<div class="cells" style="bottom:6.66%;left:53.32%;"></div>
+<div class="cells safe" style="bottom:13.32%;left:53.32%;"></div>
+<div class="cells" style="bottom:19.98%;left:53.32%;"></div>
+<div class="cells" style="bottom:26.64%;left:53.32%;"></div>
+<div class="cells" style="bottom:33.3%;left:53.32%;"></div>
+<!-- =================================
+                     RED HOME LANE
+                ================================== -->
+<div class="cells arrow" style="bottom:0;left:46.66%;">
+                    ↑
+                </div>
+<div class="cells cell-red" style="bottom:6.66%;left:46.66%;"></div>
+<div class="cells cell-red" style="bottom:13.32%;left:46.66%;"></div>
+<div class="cells cell-red" style="bottom:19.98%;left:46.66%;"></div>
+<div class="cells cell-red" style="bottom:26.64%;left:46.66%;"></div>
+<div class="cells cell-red" style="bottom:33.3%;left:46.66%;"></div>
+<!-- =================================
+                     BOTTOM LEFT VERTICAL PATH
+                ================================== -->
+<div class="cells" style="bottom:0;left:40%;"></div>
+<div class="cells r-start" style="bottom:6.66%;left:40%;"></div>
+<div class="cells" style="bottom:13.32%;left:40%;"></div>
+<div class="cells" style="bottom:19.98%;left:40%;"></div>
+<div class="cells" style="bottom:26.64%;left:40%;"></div>
+<div class="cells" style="bottom:33.3%;left:40%;"></div>
+<!-- =================================
+                     BOTTOM LEFT HORIZONTAL PATH
+                ================================== -->
+<div class="cells" style="top:53.32%;left:33.3%;"></div>
+<div class="cells" style="top:53.32%;left:26.64%;"></div>
+<div class="cells" style="top:53.32%;left:19.98%;"></div>
+<div class="cells safe" style="top:53.32%;left:13.32%;"></div>
+<div class="cells" style="top:53.32%;left:6.66%;"></div>
+<div class="cells" style="top:53.32%;left:0;"></div>
+<!-- =================================
+                     GREEN HOME LANE
+                ================================== -->
+<div class="cells cell-green" style="top:46.66%;left:33.3%;"></div>
+<div class="cells cell-green" style="top:46.66%;left:26.64%;"></div>
+<div class="cells cell-green" style="top:46.66%;left:19.98%;"></div>
+<div class="cells cell-green" style="top:46.66%;left:13.32%;"></div>
+<div class="cells cell-green" style="top:46.66%;left:6.66%;"></div>
+<div class="cells arrow" style="top:46.66%;left:0;">
+                    →
+                </div>
+<!-- =================================
+                     PLAYER 1 COINS
+                ================================== -->
+<div class="coin" id="player-coin-1" onclick="moveCoin(1)"></div>
+<div class="coin" id="player-coin-2" onclick="moveCoin(2)"></div>
+<div class="coin" id="player-coin-3" onclick="moveCoin(3)"></div>
+<div class="coin" id="player-coin-4" onclick="moveCoin(4)"></div>
+<!-- =================================
+                     PLAYER 2 COINS
+                ================================== -->
+<div class="coin" id="opponent-coin-1"></div>
+<div class="coin" id="opponent-coin-2"></div>
+<div class="coin" id="opponent-coin-3"></div>
+<div class="coin" id="opponent-coin-4"></div>
+</div>
+<div id="calibrationMarker"></div>
+</div>
+<div class="calibration-panel">
+<div class="coord-grid">
+<div class="coord-box"><span class="coord-label">Selected Cell</span><span id="cellValue" class="coord-value">—</span></div>
+<div class="coord-box"><span class="coord-label">Cell Top / Left</span><span id="cellValue2" class="coord-value">—</span></div>
+<div class="coord-box"><span class="coord-label">Coin Top / Left</span><span id="coinValue" class="coord-value">—</span></div>
+<div class="coord-box"><span class="coord-label">CSS To Copy</span><span id="copyValue" class="coord-value">—</span></div>
+</div>
+<div id="info">Click any movement cell.</div>
+<button id="copyButton" type="button">Copy Coin Coordinate</button>
+</div>
+</div>
+<script>
+const board=document.getElementById('ludoBoard');
+const cells=board.querySelectorAll('.cells');
+const marker=document.getElementById('calibrationMarker');
+let lastText='';
+function pct(v){return v.toFixed(2)+'%';}
+cells.forEach((cell,index)=>{
+ cell.addEventListener('click',(event)=>{
+  event.stopPropagation();
+  const boardRect=board.getBoundingClientRect();
+  const cellRect=cell.getBoundingClientRect();
+  const cellLeft=((cellRect.left-boardRect.left)/boardRect.width)*100;
+  const cellTop=((cellRect.top-boardRect.top)/boardRect.height)*100;
+  // The actual .coin CSS uses translate(-50%,-50%), so coin top/left is the CELL CENTER.
+  const coinLeft=(((cellRect.left+cellRect.width/2)-boardRect.left)/boardRect.width)*100;
+  const coinTop=(((cellRect.top+cellRect.height/2)-boardRect.top)/boardRect.height)*100;
+  const coinText='{ top: "'+pct(coinTop)+'", left: "'+pct(coinLeft)+'" }';
+  document.getElementById('cellValue').textContent='#'+index;
+  document.getElementById('cellValue2').textContent=pct(cellTop)+' / '+pct(cellLeft);
+  document.getElementById('coinValue').textContent=pct(coinTop)+' / '+pct(coinLeft);
+  document.getElementById('copyValue').textContent=coinText;
+  document.getElementById('info').textContent='Cell #'+index+' selected. Use COIN Top / Left in mainPath.';
+  cells.forEach(c=>c.style.outline='');
+  cell.style.outline='3px solid #ffd700';
+  marker.style.display='block';
+  marker.style.left=pct(coinLeft);
+  marker.style.top=pct(coinTop);
+  lastText=coinText;
+ });
+});
+document.getElementById('copyButton').addEventListener('click',async()=>{
+ if(!lastText){alert('Select a movement box first.');return;}
+ try{await navigator.clipboard.writeText(lastText);document.getElementById('info').textContent='Copied: '+lastText;}
+ catch(e){alert(lastText);}
+});
+</script>
+</body>
+</html>

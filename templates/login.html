@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LodoPlayers - Login</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+
+<body>
+
+    <div class="login-container">
+
+    <div class="logo-section">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LodoPlayers Logo">
+    </div>
+
+    <form class="input-section" method="POST" action="{{ url_for('login') }}">
+
+        <p class="input-title">Enter your username</p>
+
+        <input
+            type="text"
+            name="username"
+            placeholder="Username"
+            required>
+
+        <p class="input-title password-title">Enter your password</p>
+
+        <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            required>
+
+        <button type="submit" class="login-btn">
+            Login
+        </button>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <p class="error-message">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        
+
+        <button
+            type="button"
+            class="create-account-btn"
+            onclick="window.location.href='{{ url_for('create_account') }}'">
+
+            Create New Account
+
+        </button>
+
+    </form>
+
+</div>
+
+</body>
+</html>

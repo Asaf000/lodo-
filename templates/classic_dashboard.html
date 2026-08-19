@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Lodo Classic Dashboard</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/classic_dashboard.css') }}">
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         TOP NAVIGATION
+    ====================================================== -->
+
+    <nav class="top-navbar">
+
+        <div class="logo-section">
+
+            <img
+                src="{{ url_for('static', filename='images/logo.png') }}"
+                alt="Logo">
+
+        </div>
+
+
+        <button
+            class="menu-btn"
+            type="button"
+            onclick="toggleMenu()">
+
+            &#9776;
+
+        </button>
+
+    </nav>
+
+
+    <!-- =====================================================
+         MOBILE MENU
+    ====================================================== -->
+
+    <div
+        class="mobile-menu"
+        id="mobileMenu">
+
+        <a href="{{ url_for('withdrawal') }}">
+            Withdrawals
+        </a>
+
+        <a href="{{ url_for('balance') }}">
+            Balance
+        </a>
+
+        <a href="{{ url_for('matches') }}">
+    Matches
+</a>
+
+        <a href="{{ url_for('profile') }}">
+            Profile
+        </a>
+
+        
+
+        <a href="{{ url_for('logout') }}">
+            Logout
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         MAIN SECTION
+    ====================================================== -->
+
+    <main class="main-section">
+
+
+        <!-- =================================================
+             WELCOME CARD
+        ================================================== -->
+
+        <div class="welcome-card">
+
+            <h2>
+                Welcome, Player
+            </h2>
+
+            <p>
+                Play out your luck today,<br>
+                and you can be a millionaire tomorrow.
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             ACCOUNT DETAILS CARD
+        ================================================== -->
+
+        <div class="account-details-card">
+
+            <h2>
+                Please add your account details where you want
+                to receive your withdrawals.
+            </h2>
+
+
+            <form
+                method="POST"
+                action="{{ url_for('save_account_details') }}">
+
+
+                <input
+                    type="text"
+                    name="bankname"
+                    class="account-input"
+                    placeholder="Bank Name">
+
+
+                <input
+                    type="text"
+                    name="bankaccountnumber"
+                    class="account-input"
+                    placeholder="Account Number">
+
+
+                <input
+                    type="text"
+                    name="ifsccode"
+                    class="account-input"
+                    placeholder="IFSC Code">
+
+
+                <input
+                    type="text"
+                    name="upiid"
+                    class="account-input"
+                    placeholder="UPI ID">
+
+
+                <p class="account-note">
+
+                    Either complete Bank Details or a UPI ID is required.
+
+                </p>
+
+
+                <button
+                    type="submit"
+                    class="submit-account-btn">
+
+                    Submit
+
+                </button>
+
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+
+                    {% if messages %}
+
+                        {% for category, message in messages %}
+
+                            <p class="{% if category == 'success' %}success-message{% else %}error-message{% endif %}">
+
+                                {{ message }}
+
+                            </p>
+
+                        {% endfor %}
+
+                    {% endif %}
+
+                {% endwith %}
+
+
+            </form>
+
+        </div>
+
+
+        <!-- =================================================
+             START MATCH CARD
+        ================================================== -->
+
+        <div class="match-card">
+
+
+            <h3>
+
+                Balance :
+
+                <span class="balance-amount">
+
+                    ₹{{ balance }}
+
+                </span>
+
+            </h3>
+
+
+            {% if can_start_match %}
+
+
+                <!-- =========================================
+                     INITIATE MATCH FORM
+                ========================================== -->
+
+                <form
+                    method="POST"
+                    action="{{ url_for('classic_dashboard') }}">
+
+
+                    <input
+                        type="hidden"
+                        name="action"
+                        value="initiate_match">
+
+
+                    <!-- QUICK AMOUNTS -->
+
+                    <div class="quick-amounts">
+
+
+                        <button
+                            type="button"
+                            class="amount-btn"
+                            onclick="setAmount(50)">
+
+                            50
+
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="amount-btn"
+                            onclick="setAmount(200)">
+
+                            200
+
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="amount-btn"
+                            onclick="setAmount(350)">
+
+                            350
+
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="amount-btn"
+                            onclick="setAmount(500)">
+
+                            500
+
+                        </button>
+
+
+                    </div>
+
+
+                    <!-- AMOUNT INPUT -->
+
+                    <input
+                        type="number"
+                        id="amount"
+                        name="amount"
+                        class="room-code-input"
+                        placeholder="Enter Amount"
+                        min="50"
+                        max="5000000"
+                        step="50"
+                        required>
+
+
+                    <!-- START MATCH BUTTON -->
+
+                    <button
+                        type="submit"
+                        class="start-match-btn">
+
+                        Start Match
+
+                    </button>
+
+
+                    <!-- FLASH MESSAGE -->
+
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+
+                        {% if messages %}
+
+                            {% for category, message in messages %}
+
+                                <p class="{% if category == 'success' %}success-message{% else %}error-message{% endif %}">
+
+                                    {{ message }}
+
+                                </p>
+
+                            {% endfor %}
+
+                        {% endif %}
+
+                    {% endwith %}
+
+
+                </form>
+
+
+            {% else %}
+
+
+                <!-- =========================================
+                     ACTIVE MATCH MESSAGE
+                ========================================== -->
+
+                <p class="active-match-message">
+
+                    Please wait before starting another match.
+
+                </p>
+
+
+            {% endif %}
+
+
+        </div>
+
+
+        <!-- =================================================
+             INITIATOR COLOUR SELECTION MODAL
+        ================================================== -->
+
+        {% if show_color_modal %}
+
+
+            <div class="color-modal-overlay">
+
+
+                <div class="color-modal">
+
+
+                    <!-- CLOSE BUTTON -->
+
+                    <button
+                        type="button"
+                        class="close-modal"
+                        onclick="closeColorModal()">
+
+                        &times;
+
+                    </button>
+
+
+                    <h2>
+                        Choose Your Coin Colour
+                    </h2>
+
+
+                    <form
+                        method="POST"
+                        action="{{ url_for('classic_dashboard') }}">
+
+
+                        <input
+                            type="hidden"
+                            name="action"
+                            value="initiate_match">
+
+
+                        <input
+                            type="hidden"
+                            name="amount"
+                            value="{{ selected_amount }}">
+
+
+                        <!-- COLOUR OPTIONS -->
+
+                        <div class="color-options">
+
+
+                            <!-- RED -->
+
+                            <label class="color-option">
+
+                                <input
+                                    type="radio"
+                                    name="color"
+                                    value="red"
+                                    required>
+
+                                <span class="color-circle red"></span>
+
+                                <span>
+                                    Red
+                                </span>
+
+                            </label>
+
+
+                            <!-- BLUE -->
+
+                            <label class="color-option">
+
+                                <input
+                                    type="radio"
+                                    name="color"
+                                    value="blue"
+                                    required>
+
+                                <span class="color-circle blue"></span>
+
+                                <span>
+                                    Blue
+                                </span>
+
+                            </label>
+
+
+                            <!-- GREEN -->
+
+                            <label class="color-option">
+
+                                <input
+                                    type="radio"
+                                    name="color"
+                                    value="green"
+                                    required>
+
+                                <span class="color-circle green"></span>
+
+                                <span>
+                                    Green
+                                </span>
+
+                            </label>
+
+
+                            <!-- YELLOW -->
+
+                            <label class="color-option">
+
+                                <input
+                                    type="radio"
+                                    name="color"
+                                    value="yellow"
+                                    required>
+
+                                <span class="color-circle yellow"></span>
+
+                                <span>
+                                    Yellow
+                                </span>
+
+                            </label>
+
+
+                        </div>
+
+
+                        <!-- CONFIRM -->
+
+                        <button
+                            type="submit"
+                            class="confirm-match-btn">
+
+                            Start Match
+
+                        </button>
+
+
+                    </form>
+
+
+                </div>
+
+            </div>
+
+
+        {% endif %}
+
+
+
+        <!-- =================================================
+             AVAILABLE MATCHES
+        ================================================== -->
+
+        <div class="available-matches-card">
+
+
+            <h2>
+                Play a Match
+            </h2>
+
+
+            {% if matches %}
+
+
+                {% for match in matches %}
+
+
+                    <div class="available-match">
+
+
+                        <!-- MATCH INFORMATION -->
+
+                        <div class="match-information">
+
+
+                            <!-- AMOUNT -->
+
+                            <div class="match-amount">
+
+                                <strong>
+                                    Amount
+                                </strong>
+
+                                <span>
+                                    ₹{{ match.amount }}
+                                </span>
+
+                            </div>
+
+
+                            <!-- PLAYER COLOUR -->
+
+                            <div class="match-color">
+
+                                <strong>
+                                    Player Selected Color
+                                </strong>
+
+                                <span
+                                    class="player-color {{ match.initiatedusercolor }}">
+
+                                    {{ match.initiatedusercolor|capitalize }}
+
+                                </span>
+
+                            </div>
+
+
+                        </div>
+
+
+                        <!-- PLAY FORM -->
+
+                        <form
+                            method="POST"
+                            action="{{ url_for('classic_dashboard') }}"
+                            class="play-form">
+
+
+                            <input
+                                type="hidden"
+                                name="action"
+                                value="join_match">
+
+
+                            <input
+                                type="hidden"
+                                name="matchbatchnumber"
+                                value="{{ match.matchbatchnumber }}">
+
+
+                            <button
+                                type="submit"
+                                class="play-match-btn">
+
+                                Play
+
+                            </button>
+
+
+                        </form>
+
+
+                    </div>
+
+
+                {% endfor %}
+
+
+            {% else %}
+
+
+                <p class="no-matches">
+
+                    No matches available right now.
+
+                </p>
+
+
+            {% endif %}
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             SECOND PLAYER COLOUR SELECTION MODAL
+        ================================================== -->
+
+        {% if show_join_color_modal %}
+
+
+            <div
+                class="color-modal-overlay"
+                id="joinColorModal">
+
+
+                <div class="color-modal">
+
+
+                    <!-- CLOSE BUTTON -->
+
+                    <button
+                        type="button"
+                        class="close-modal"
+                        onclick="closeJoinModal()">
+
+                        &times;
+
+                    </button>
+
+
+                    <h2>
+                        Choose Your Coin Colour
+                    </h2>
+
+
+                    <form
+                        method="POST"
+                        action="{{ url_for('classic_dashboard') }}">
+
+
+                        <input
+                            type="hidden"
+                            name="action"
+                            value="join_match">
+
+
+                        <input
+                            type="hidden"
+                            name="matchbatchnumber"
+                            value="{{ join_match_number }}">
+
+
+                        <!-- AVAILABLE COLOURS -->
+
+                        <div class="color-options">
+
+
+                            <!-- RED -->
+
+                            {% if initiator_color != "red" %}
+
+                                <label class="color-option">
+
+                                    <input
+                                        type="radio"
+                                        name="color"
+                                        value="red"
+                                        required>
+
+                                    <span class="color-circle red"></span>
+
+                                    <span>
+                                        Red
+                                    </span>
+
+                                </label>
+
+                            {% endif %}
+
+
+                            <!-- BLUE -->
+
+                            {% if initiator_color != "blue" %}
+
+                                <label class="color-option">
+
+                                    <input
+                                        type="radio"
+                                        name="color"
+                                        value="blue"
+                                        required>
+
+                                    <span class="color-circle blue"></span>
+
+                                    <span>
+                                        Blue
+                                    </span>
+
+                                </label>
+
+                            {% endif %}
+
+
+                            <!-- GREEN -->
+
+                            {% if initiator_color != "green" %}
+
+                                <label class="color-option">
+
+                                    <input
+                                        type="radio"
+                                        name="color"
+                                        value="green"
+                                        required>
+
+                                    <span class="color-circle green"></span>
+
+                                    <span>
+                                        Green
+                                    </span>
+
+                                </label>
+
+                            {% endif %}
+
+
+                            <!-- YELLOW -->
+
+                            {% if initiator_color != "yellow" %}
+
+                                <label class="color-option">
+
+                                    <input
+                                        type="radio"
+                                        name="color"
+                                        value="yellow"
+                                        required>
+
+                                    <span class="color-circle yellow"></span>
+
+                                    <span>
+                                        Yellow
+                                    </span>
+
+                                </label>
+
+                            {% endif %}
+
+
+                        </div>
+
+
+                        <!-- START MATCH -->
+
+                        <button
+                            type="submit"
+                            class="confirm-match-btn">
+
+                            Start Match
+
+                        </button>
+
+
+                    </form>
+
+
+                </div>
+
+            </div>
+
+
+        {% endif %}
+
+
+<div
+    id="readyMatchPopup"
+    class="ready-modal-overlay"
+    style="display: none;">
+
+    <div class="ready-modal">
+
+        <h2>
+            Let's start the match
+        </h2>
+
+        <p>
+            Are you ready?
+        </p>
+
+
+        <div class="ready-buttons">
+
+
+            <button
+                type="button"
+                class="ready-start-btn"
+                onclick="readyStartMatch()">
+
+                Start Match
+
+            </button>
+
+
+            <button
+                type="button"
+                class="ready-cancel-btn"
+                onclick="readyCancelMatch()">
+
+                No
+
+            </button>
+
+
+        </div>
+
+    </div>
+
+</div>
+
+<div
+    id="waitingMessage"
+    class="waiting-message"
+    style="display:none;">
+
+    Waiting for the other player...
+
+</div>
+
+
+
+    </main>
+
+
+
+    <!-- =====================================================
+         MENU JAVASCRIPT
+    ====================================================== -->
+
+    <script>
+
+        function toggleMenu() {
+
+            document
+                .getElementById("mobileMenu")
+                .classList
+                .toggle("active");
+
+        }
+
+    </script>
+
+
+
+    <!-- =====================================================
+         FLASH MESSAGE JAVASCRIPT
+    ====================================================== -->
+
+    <script>
+
+        setTimeout(function() {
+
+            const success =
+                document.querySelector(".success-message");
+
+            const error =
+                document.querySelector(".error-message");
+
+
+            if (success) {
+
+                success.style.display = "none";
+
+            }
+
+
+            if (error) {
+
+                error.style.display = "none";
+
+            }
+
+        }, 5000);
+
+    </script>
+
+
+
+    <!-- =====================================================
+         QUICK AMOUNT JAVASCRIPT
+    ====================================================== -->
+
+    <script>
+
+        function setAmount(value) {
+
+            document
+                .getElementById("amount")
+                .value = value;
+
+        }
+
+    </script>
+
+
+
+    <!-- =====================================================
+         CLOSE INITIATOR COLOUR MODAL
+    ====================================================== -->
+
+    <script>
+
+        function closeColorModal() {
+
+            window.location.href =
+                "{{ url_for('classic_dashboard') }}";
+
+        }
+
+    </script>
+
+
+
+    <!-- =====================================================
+         CLOSE SECOND PLAYER COLOUR MODAL
+    ====================================================== -->
+
+    <script>
+
+        function closeJoinModal() {
+
+            window.location.href =
+                "{{ url_for('classic_dashboard') }}";
+
+        }
+
+    </script>
+
+<script>
+
+{% if should_monitor_match %}
+
+let readyStatusInterval = null;
+
+
+/* ==================================================
+   START POLLING
+================================================== */
+
+function startReadyPolling() {
+
+    if (readyStatusInterval !== null) {
+        return;
+    }
+
+    // Check immediately
+    checkReadyStatus();
+
+    // Then check every second
+    readyStatusInterval = setInterval(
+        checkReadyStatus,
+        1000
+    );
+}
+
+
+/* ==================================================
+   STOP POLLING
+================================================== */
+
+function stopReadyPolling() {
+
+    if (readyStatusInterval !== null) {
+
+        clearInterval(
+            readyStatusInterval
+        );
+
+        readyStatusInterval = null;
+    }
+}
+
+
+/* ==================================================
+   CHECK MATCH STATUS
+================================================== */
+
+function checkReadyStatus() {
+
+    fetch(
+        "{{ url_for('match_ready_status') }}",
+        {
+            method: "GET",
+            cache: "no-store"
+        }
+    )
+
+    .then(response => {
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Status request failed"
+            );
+        }
+
+        return response.json();
+
+    })
+
+    .then(data => {
+
+        /*
+         * The user's relevant match no longer exists.
+         */
+
+        if (!data.match_found) {
+
+            stopReadyPolling();
+
+            return;
+        }
+
+
+        /*
+         * Both players are ready.
+         *
+         * The server has already changed
+         * matchstarted to 1.
+         */
+
+        if (data.matchstarted) {
+
+            stopReadyPolling();
+
+            window.location.href =
+                "{{ url_for('lodo_player_game') }}";
+
+            return;
+        }
+
+
+        /*
+         * Two players are assigned and
+         * the match has not started yet.
+         *
+         * Show the ready popup.
+         */
+
+        if (data.matchbatchnumber) {
+
+            showReadyPopup(
+                data.matchbatchnumber
+            );
+
+        }
+
+    })
+
+    .catch(error => {
+
+        console.error(
+            "Match status error:",
+            error
+        );
+
+    });
+}
+
+
+/* ==================================================
+   SHOW READY POPUP
+================================================== */
+
+function showReadyPopup(matchNumber) {
+
+    const popup =
+        document.getElementById(
+            "readyMatchPopup"
+        );
+
+
+    if (!popup) {
+        return;
+    }
+
+
+    /*
+     * Don't repeatedly recreate the popup
+     * if it is already visible.
+     */
+
+    if (
+        popup.style.display === "flex"
+    ) {
+        return;
+    }
+
+
+    popup.dataset.matchnumber =
+        matchNumber;
+
+
+    popup.style.display =
+        "flex";
+}
+
+
+/* ==================================================
+   START MATCH BUTTON
+================================================== */
+
+function readyStartMatch() {
+
+    const popup =
+        document.getElementById(
+            "readyMatchPopup"
+        );
+
+
+    if (!popup) {
+        return;
+    }
+
+
+    const matchNumber =
+        popup.dataset.matchnumber;
+
+
+    if (!matchNumber) {
+        return;
+    }
+
+
+    submitReadyStatus(
+        matchNumber,
+        1
+    );
+}
+
+
+/* ==================================================
+   NO BUTTON
+================================================== */
+
+function readyCancelMatch() {
+
+    const popup =
+        document.getElementById(
+            "readyMatchPopup"
+        );
+
+
+    if (!popup) {
+        return;
+    }
+
+
+    const matchNumber =
+        popup.dataset.matchnumber;
+
+
+    if (!matchNumber) {
+        return;
+    }
+
+
+    submitReadyStatus(
+        matchNumber,
+        0
+    );
+}
+
+
+/* ==================================================
+   SUBMIT READY STATUS
+================================================== */
+
+function submitReadyStatus(
+    matchNumber,
+    readyValue
+) {
+
+    const form =
+        document.createElement("form");
+
+
+    form.method =
+        "POST";
+
+
+    form.action =
+        "{{ url_for('classic_dashboard') }}";
+
+
+    /* Action */
+
+    const actionInput =
+        document.createElement("input");
+
+    actionInput.type =
+        "hidden";
+
+    actionInput.name =
+        "action";
+
+    actionInput.value =
+        "ready_match";
+
+
+    /* Match number */
+
+    const matchInput =
+        document.createElement("input");
+
+    matchInput.type =
+        "hidden";
+
+    matchInput.name =
+        "matchbatchnumber";
+
+    matchInput.value =
+        matchNumber;
+
+
+    /* Ready value */
+
+    const readyInput =
+        document.createElement("input");
+
+    readyInput.type =
+        "hidden";
+
+    readyInput.name =
+        "ready";
+
+    readyInput.value =
+        readyValue;
+
+
+    form.appendChild(
+        actionInput
+    );
+
+    form.appendChild(
+        matchInput
+    );
+
+    form.appendChild(
+        readyInput
+    );
+
+
+    document.body.appendChild(
+        form
+    );
+
+
+    form.submit();
+}
+
+
+/* ==================================================
+   START MONITORING
+================================================== */
+
+startReadyPolling();
+
+
+{% endif %}
+
+</script>
+
+</body>
+
+</html>
+

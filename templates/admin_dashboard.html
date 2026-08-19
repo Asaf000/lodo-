@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        LP Admin Dashboard
+    </title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            margin: 0;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background: #f4f7fb;
+
+            color: #172033;
+
+        }
+
+
+        /* =================================
+           TOP NAVBAR
+        ================================= */
+
+        .top-navbar {
+
+            height: 70px;
+
+            background: #ffffff;
+
+            border-bottom:
+                1px solid #e5eaf1;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding:
+                0 35px;
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 100;
+
+        }
+
+
+        .logo {
+
+            font-size: 28px;
+
+            font-weight: 800;
+
+            color: #1769e0;
+
+            letter-spacing: 1px;
+
+        }
+
+
+        .logout-btn {
+
+            text-decoration: none;
+
+            background: #1769e0;
+
+            color: #ffffff;
+
+            padding:
+                10px 20px;
+
+            border-radius: 8px;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            transition: 0.2s ease;
+
+        }
+
+
+        .logout-btn:hover {
+
+            background: #0d55bd;
+
+        }
+
+
+        /* =================================
+           MAIN CONTAINER
+        ================================= */
+
+        .main-container {
+
+            width: 92%;
+
+            max-width: 1200px;
+
+            margin:
+                35px auto;
+
+        }
+
+
+        /* =================================
+           REVENUE CARD
+        ================================= */
+
+        .revenue-card {
+
+            background: #ffffff;
+
+            border:
+                1px solid #e4eaf2;
+
+            border-radius: 16px;
+
+            padding: 30px;
+
+            box-shadow:
+                0 8px 25px
+                rgba(25, 60, 100, 0.06);
+
+            text-align: center;
+
+        }
+
+
+        .revenue-title {
+
+            font-size: 15px;
+
+            font-weight: 600;
+
+            color: #718096;
+
+            text-transform: uppercase;
+
+            letter-spacing: 1px;
+
+        }
+
+
+        .revenue-value {
+
+            margin-top: 10px;
+
+            font-size: 38px;
+
+            font-weight: 800;
+
+            color: #1769e0;
+
+        }
+
+
+        /* =================================
+           ACTION BUTTONS
+        ================================= */
+
+        .action-buttons {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 18px;
+
+            margin-top: 25px;
+
+        }
+
+
+        .action-btn {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            min-height: 55px;
+
+            text-decoration: none;
+
+            border:
+                1px solid #1769e0;
+
+            border-radius: 10px;
+
+            color: #1769e0;
+
+            background: #ffffff;
+
+            font-size: 15px;
+
+            font-weight: 700;
+
+            transition: 0.2s ease;
+
+        }
+
+
+        .action-btn:hover {
+
+            background: #1769e0;
+
+            color: #ffffff;
+
+        }
+
+
+        /* =================================
+           ACCOUNT DETAILS
+        ================================= */
+
+        .account-card {
+
+            background: #ffffff;
+
+            border:
+                1px solid #e4eaf2;
+
+            border-radius: 16px;
+
+            padding: 30px;
+
+            margin-top: 30px;
+
+            box-shadow:
+                0 8px 25px
+                rgba(25, 60, 100, 0.06);
+
+        }
+
+
+        .section-title {
+
+            margin: 0 0 25px;
+
+            font-size: 21px;
+
+            color: #172033;
+
+        }
+
+
+        .account-form {
+
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap: 20px;
+
+        }
+
+
+        .form-group {
+
+            display: flex;
+
+            flex-direction: column;
+
+        }
+
+
+        .form-group label {
+
+            margin-bottom: 8px;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            color: #4a5568;
+
+        }
+
+
+        .form-group input {
+
+            width: 100%;
+
+            padding:
+                13px 14px;
+
+            border:
+                1px solid #d8e0eb;
+
+            border-radius: 8px;
+
+            font-size: 14px;
+
+            outline: none;
+
+            background: #ffffff;
+
+        }
+
+
+        .form-group input:focus {
+
+            border-color: #1769e0;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(23, 105, 224, 0.10);
+
+        }
+
+
+        .submit-container {
+
+            grid-column:
+                1 / -1;
+
+            display: flex;
+
+            justify-content: flex-end;
+
+            margin-top: 5px;
+
+        }
+
+
+        .submit-btn {
+
+            border: none;
+
+            background: #1769e0;
+
+            color: #ffffff;
+
+            padding:
+                12px 30px;
+
+            border-radius: 8px;
+
+            font-size: 14px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+        }
+
+
+        .submit-btn:hover {
+
+            background: #0d55bd;
+
+        }
+
+
+        /* =================================
+           FLASH MESSAGE
+        ================================= */
+
+        .flash-message {
+
+            margin-bottom: 20px;
+
+            padding:
+                13px 16px;
+
+            border-radius: 8px;
+
+            font-size: 14px;
+
+            background: #e8f1ff;
+
+            color: #1455a0;
+
+            border:
+                1px solid #c9ddff;
+
+        }
+
+
+        /* =================================
+           MOBILE
+        ================================= */
+
+        @media (
+            max-width: 700px
+        ) {
+
+            .top-navbar {
+
+                padding:
+                    0 20px;
+
+            }
+
+
+            .main-container {
+
+                width: 94%;
+
+                margin-top: 25px;
+
+            }
+
+
+            .action-buttons {
+
+                grid-template-columns:
+                    1fr;
+
+            }
+
+
+            .account-form {
+
+                grid-template-columns:
+                    1fr;
+
+            }
+
+
+            .submit-container {
+
+                grid-column:
+                    auto;
+
+            }
+
+
+            .submit-btn {
+
+                width: 100%;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =================================
+         TOP NAVBAR
+    ================================= -->
+
+    <nav class="top-navbar">
+
+        <div class="logo">
+            LP
+        </div>
+
+
+        <a
+            href="{{ url_for('admin.admin_logout') }}"
+            class="logout-btn"
+        >
+            Logout
+        </a>
+
+    </nav>
+
+
+    <!-- =================================
+         MAIN
+    ================================= -->
+
+    <main class="main-container">
+
+
+        <!-- =================================
+             FLASH MESSAGES
+        ================================= -->
+
+        {% with messages =
+            get_flashed_messages(
+                with_categories=true
+            )
+        %}
+
+            {% for category, message in messages %}
+
+                <div class="flash-message">
+
+                    {{ message }}
+
+                </div>
+
+            {% endfor %}
+
+        {% endwith %}
+
+
+        <!-- =================================
+             REVENUE
+        ================================= -->
+
+        <section class="revenue-card">
+
+            <div class="revenue-title">
+
+                Total Revenue Collected
+
+            </div>
+
+
+            <div class="revenue-value">
+
+                ₹{{ "%.2f"|format(total_revenue) }}
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================
+             ACTION BUTTONS
+        ================================= -->
+
+        <div class="action-buttons">
+
+
+            <a
+                href="{{ url_for('admin.admin_withdrawal') }}"
+                class="action-btn"
+            >
+                Withdrawal
+            </a>
+
+
+            <a
+                href="{{ url_for('admin.admin_add_balance') }}"
+                class="action-btn"
+            >
+                Add Balance
+            </a>
+
+
+            <a
+                href="{{ url_for('admin.admin_add_employee') }}"
+                class="action-btn"
+            >
+                Add Employee
+            </a>
+
+
+        </div>
+
+
+        <!-- =================================
+             ACCOUNT DETAILS
+        ================================= -->
+
+        <section class="account-card">
+
+
+            <h2 class="section-title">
+
+                Account Details
+
+            </h2>
+
+
+            <form
+                method="POST"
+                action="{{
+                    url_for(
+                        'admin.update_account_details'
+                    )
+                }}"
+                class="account-form"
+            >
+
+
+                <div class="form-group">
+
+                    <label
+                        for="bankaccountnumber"
+                    >
+                        Bank Account Number
+                    </label>
+
+                    <input
+                        type="text"
+                        id="bankaccountnumber"
+                        name="bankaccountnumber"
+                        value="{{
+                            account.bankaccountnumber
+                            if account
+                            else ''
+                        }}"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label
+                        for="name"
+                    >
+                        Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        value="{{
+                            account.name
+                            if account
+                            else ''
+                        }}"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label
+                        for="ifsccode"
+                    >
+                        IFSC Code
+                    </label>
+
+                    <input
+                        type="text"
+                        id="ifsccode"
+                        name="ifsccode"
+                        value="{{
+                            account.ifsccode
+                            if account
+                            else ''
+                        }}"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label
+                        for="upiid"
+                    >
+                        UPI ID
+                    </label>
+
+                    <input
+                        type="text"
+                        id="upiid"
+                        name="upiid"
+                        value="{{
+                            account.upiid
+                            if account
+                            else ''
+                        }}"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="submit-container">
+
+                    <button
+                        type="submit"
+                        class="submit-btn"
+                    >
+                        Submit
+                    </button>
+
+                </div>
+
+
+            </form>
+
+
+        </section>
+
+
+    </main>
+
+
+</body>
+
+</html>

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Matches - LodoPlayers</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/matches.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================================
+         TOP NAVIGATION
+    ========================================== -->
+
+    <nav class="top-navbar">
+
+
+        <!-- LOGO -->
+
+        <div class="logo-section">
+
+            <img
+                src="{{ url_for('static', filename='images/logo.png') }}"
+                alt="LodoPlayers Logo"
+            >
+
+        </div>
+
+
+        <!-- MENU BUTTON -->
+
+        <button
+            class="menu-btn"
+            type="button"
+            onclick="toggleMenu()"
+        >
+
+            &#9776;
+
+        </button>
+
+
+    </nav>
+
+
+
+    <!-- =========================================
+         MENU
+    ========================================== -->
+
+    <div
+        class="mobile-menu"
+        id="mobileMenu"
+    >
+
+        <a href="{{ url_for('classic_dashboard') }}">
+            Dashboard
+        </a>
+
+        <a href="{{ url_for('matches') }}">
+            Matches
+        </a>
+
+        <a href="{{ url_for('withdrawal') }}">
+            Withdrawals
+        </a>
+
+        <a href="{{ url_for('balance') }}">
+            Balance
+        </a>
+
+        <a href="{{ url_for('profile') }}">
+            Profile
+        </a>
+
+        
+
+        <a href="{{ url_for('logout') }}">
+            Logout
+        </a>
+
+    </div>
+
+
+
+    <!-- =========================================
+         MAIN MATCH HISTORY
+    ========================================== -->
+
+    <main class="main-section">
+
+
+        <div class="matches-container">
+
+
+            <h2 class="matches-heading">
+                Match History
+            </h2>
+
+
+            <!-- =================================
+                 MATCH LIST
+            ================================= -->
+
+            {% if played_matches %}
+
+
+                {% for match in played_matches %}
+
+
+                    <div class="match-history-card">
+
+
+                        <!-- PLAYER 1 -->
+
+                        <div class="match-row">
+
+                            <span class="match-label">
+                                Player 1:
+                            </span>
+
+                            <span class="match-value">
+
+                                {{ match.player1_username or '...' }}
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- AMOUNT -->
+
+                        <div class="match-row">
+
+                            <span class="match-label">
+                                Amount:
+                            </span>
+
+                            <span class="match-value">
+
+                                ₹{{ match.amount }}
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- PLAYER 2 -->
+
+                        <div class="match-row">
+
+                            <span class="match-label">
+                                Player 2:
+                            </span>
+
+                            <span class="match-value">
+
+                                {{ match.player2_username or '...' }}
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- WINNER -->
+
+                        <div class="match-row">
+
+                            <span class="match-label">
+                                Winner:
+                            </span>
+
+                            <span class="match-value">
+
+                                {{ match.winner_username or '...' }}
+
+                            </span>
+
+                        </div>
+
+
+                    </div>
+
+
+                {% endfor %}
+
+
+            {% else %}
+
+
+                <!-- =================================
+                     NO MATCHES
+                ================================= -->
+
+                <div class="no-matches">
+
+                    No matches played yet.
+
+                </div>
+
+
+            {% endif %}
+
+
+
+            <!-- =================================
+                 PAGINATION
+            ================================= -->
+
+            {% if total_pages > 1 %}
+
+
+                <div class="pagination">
+
+
+                    <!-- PREVIOUS -->
+
+                    {% if page > 1 %}
+
+                        <a
+                            href="{{ url_for('matches', page=page - 1) }}"
+                            class="pagination-btn"
+                        >
+
+                            Previous
+
+                        </a>
+
+                    {% endif %}
+
+
+
+                    <!-- PAGE NUMBER -->
+
+                    <span class="page-number">
+
+                        Page {{ page }} of {{ total_pages }}
+
+                    </span>
+
+
+
+                    <!-- NEXT -->
+
+                    {% if page < total_pages %}
+
+                        <a
+                            href="{{ url_for('matches', page=page + 1) }}"
+                            class="pagination-btn"
+                        >
+
+                            Next
+
+                        </a>
+
+                    {% endif %}
+
+
+                </div>
+
+
+            {% endif %}
+
+
+        </div>
+
+
+    </main>
+
+
+
+    <!-- =========================================
+         JAVASCRIPT
+    ========================================== -->
+
+    <script>
+
+        function toggleMenu() {
+
+            document
+                .getElementById("mobileMenu")
+                .classList
+                .toggle("active");
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>

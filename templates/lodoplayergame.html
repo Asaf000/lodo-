@@ -1,0 +1,3582 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Lodo Game</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/lodoplayergame.css'
+        ) }}"
+    >
+
+</head>
+
+<body>
+
+
+    <!-- =====================================
+         TOP NAVBAR
+    ====================================== -->
+
+    <nav class="game-navbar">
+
+        <div class="logo-section">
+
+            <img
+                src="{{ url_for(
+                    'static',
+                    filename='images/logo.png'
+                ) }}"
+                alt="Logo"
+                class="game-logo"
+            >
+
+        </div>
+       <button
+    type="button"
+    class="music-toggle"
+    id="musicToggle"
+    onclick="toggleMusic()"
+    aria-label="Toggle music"
+>
+    🔇
+</button>
+
+        <button
+            type="button"
+            class="exit-match-btn"
+            onclick="openExitModal()"
+        >
+
+            Exit Match
+
+        </button>
+
+    </nav>
+
+
+    <!-- =====================================
+         GAME MAIN AREA
+    ====================================== -->
+
+    <main class="game-main">
+
+        <div class="game-container">
+
+
+            <!-- =================================
+                 MATCH INFORMATION
+            ================================== -->
+
+            <div class="match-info-card">
+
+                <div class="match-info-item">
+
+                    <span>
+                        Match
+                    </span>
+
+                    <strong>
+                        {{ match.matchbatchnumber }}
+                    </strong>
+
+                </div>
+
+
+                <div class="match-info-item">
+
+                    <span>
+                        Your Color
+                    </span>
+
+                    <strong
+                        class="color-name {{ player_color }}"
+                    >
+                        {{ player_color|capitalize }}
+                    </strong>
+
+                </div>
+
+
+                <div class="match-info-item">
+
+                    <span>
+                        Opponent Color
+                    </span>
+
+                    <strong
+                        class="color-name {{ opponent_color }}"
+                    >
+                        {{ opponent_color|capitalize }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================
+                 PLAYER AREA
+            ================================== -->
+
+            <div class="players-card">
+
+
+                <!-- PLAYER 2 -->
+
+                <div class="player-display opponent-display">
+
+                    <div
+                        class="player-color-dot {{ opponent_color }}"
+                    ></div>
+
+                    <div class="player-display-text">
+
+                        <span class="player-label">
+                            Opponent
+                        </span>
+
+                        <strong>
+                            {{ opponent_color|capitalize }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- TURN -->
+
+                <div
+                    id="turnDisplay"
+                    class="turn-display"
+                >
+                    Loading...
+                </div>
+
+
+                <!-- TIMER -->
+
+                <div
+                    id="turnTimer"
+                    class="turn-timer"
+                ></div>
+
+                <div
+                    id="countdown"
+                    class="countdown"
+                ></div>
+
+
+                <!-- PLAYER 1 -->
+
+                <div class="player-display your-display">
+
+                    <div
+                        class="player-color-dot {{ player_color }}"
+                    ></div>
+
+                    <div class="player-display-text">
+
+                        <span class="player-label">
+                            You
+                        </span>
+
+                        <strong>
+                            {{ player_color|capitalize }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================
+                 LUDO BOARD
+            ================================== -->
+
+            <div
+                class="game"
+                id="ludoBoard"
+            >
+
+
+                <!-- =================================
+                     TOP LEFT HOUSE
+                     UNUSED COLOR
+                ================================== -->
+
+                <div
+                    class="house"
+                    id="houseTopLeft"
+                >
+
+                    <div class="box">
+
+                        <div class="square square-one"></div>
+
+                        <div class="square square-two"></div>
+
+                        <div class="square square-three"></div>
+
+                        <div class="square square-four"></div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================
+                     TOP RIGHT HOUSE
+                     PLAYER 2
+                ================================== -->
+
+                <div
+                    class="house"
+                    id="houseTopRight"
+                >
+
+                    <div class="box">
+
+                        <div class="square square-one"></div>
+
+                        <div class="square square-two"></div>
+
+                        <div class="square square-three"></div>
+
+                        <div class="square square-four"></div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================
+                     BOTTOM LEFT HOUSE
+                     PLAYER 1
+                ================================== -->
+
+                <div
+                    class="house"
+                    id="houseBottomLeft"
+                >
+
+                    <div class="box">
+
+                        <div class="square square-one"></div>
+
+                        <div class="square square-two"></div>
+
+                        <div class="square square-three"></div>
+
+                        <div class="square square-four"></div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================
+                     BOTTOM RIGHT HOUSE
+                     UNUSED COLOR
+                ================================== -->
+
+                <div
+                    class="house"
+                    id="houseBottomRight"
+                >
+
+                    <div class="box">
+
+                        <div class="square square-one"></div>
+
+                        <div class="square square-two"></div>
+
+                        <div class="square square-three"></div>
+
+                        <div class="square square-four"></div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================
+                     CENTER HOME
+                ================================== -->
+
+                <div class="home"></div>
+
+
+                <!-- =================================
+                     TOP LEFT HORIZONTAL PATH
+                ================================== -->
+
+                <div
+                    class="cells"
+                    style="top:40%;left:0;"
+                ></div>
+
+                <div
+                    class="cells g-start"
+                    style="top:40%;left:6.66%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="top:40%;left:13.32%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="top:40%;left:19.98%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="top:40%;left:26.64%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="top:40%;left:33.3%;"
+                ></div>
+
+
+                <!-- =================================
+                     TOP VERTICAL PATH
+                ================================== -->
+
+                <div
+                    class="cells"
+                    style="top:0;left:40%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="top:6.66%;left:40%;"
+                ></div>
+
+                <div
+                    class="cells safe"
+                    style="top:13.32%;left:40%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="top:19.98%;left:40%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="top:26.64%;left:40%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="top:33.3%;left:40%;"
+                ></div>
+
+
+                <!-- =================================
+                     YELLOW HOME LANE
+                ================================== -->
+
+                <div
+                    class="cells arrow"
+                    style="top:0;left:46.66%;"
+                >
+                    &#8595;
+                </div>
+
+                <div
+                    class="cells cell-yellow"
+                    style="top:6.66%;left:46.66%;"
+                ></div>
+
+                <div
+                    class="cells cell-yellow"
+                    style="top:13.32%;left:46.66%;"
+                ></div>
+
+                <div
+                    class="cells cell-yellow"
+                    style="top:19.98%;left:46.66%;"
+                ></div>
+
+                <div
+                    class="cells cell-yellow"
+                    style="top:26.64%;left:46.66%;"
+                ></div>
+
+                <div
+                    class="cells cell-yellow"
+                    style="top:33.3%;left:46.66%;"
+                ></div>
+
+
+                <!-- =================================
+                     TOP RIGHT VERTICAL PATH
+                ================================== -->
+
+                <div
+                    class="cells"
+                    style="top:0;left:53.32%;"
+                ></div>
+
+                <div
+                    class="cells y-start"
+                    style="top:6.66%;left:53.32%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="top:13.32%;left:53.32%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="top:19.98%;left:53.32%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="top:26.64%;left:53.32%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="top:33.3%;left:53.32%;"
+                ></div>
+
+
+                <!-- =================================
+                     TOP RIGHT HORIZONTAL PATH
+                ================================== -->
+
+                <div
+                    class="cells"
+                    style="top:40%;right:33.3%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="top:40%;right:26.64%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="top:40%;right:19.98%;"
+                ></div>
+
+                <div
+                    class="cells safe"
+                    style="top:40%;right:13.32%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="top:40%;right:6.66%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="top:40%;right:0;"
+                ></div>
+
+
+                <!-- =================================
+                     BLUE HOME LANE
+                ================================== -->
+
+                <div
+                    class="cells cell-blue"
+                    style="top:46.66%;right:33.3%;"
+                ></div>
+
+                <div
+                    class="cells cell-blue"
+                    style="top:46.66%;right:26.64%;"
+                ></div>
+
+                <div
+                    class="cells cell-blue"
+                    style="top:46.66%;right:19.98%;"
+                ></div>
+
+                <div
+                    class="cells cell-blue"
+                    style="top:46.66%;right:13.32%;"
+                ></div>
+
+                <div
+                    class="cells cell-blue"
+                    style="top:46.66%;right:6.66%;"
+                ></div>
+
+                <div
+                    class="cells arrow"
+                    style="top:46.66%;right:0;"
+                >
+                    &#8592;
+                </div>
+
+
+                <!-- =================================
+                     RIGHT LOWER PATH
+                ================================== -->
+
+                <div
+                    class="cells"
+                    style="top:53.32%;right:33.3%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="top:53.32%;right:26.64%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="top:53.32%;right:19.98%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="top:53.32%;right:13.32%;"
+                ></div>
+
+                <div
+                    class="cells b-start"
+                    style="top:53.32%;right:6.66%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="top:53.32%;right:0;"
+                ></div>
+
+
+                <!-- =================================
+                     BOTTOM RIGHT VERTICAL PATH
+                ================================== -->
+
+                <div
+                    class="cells"
+                    style="bottom:0;left:53.32%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="bottom:6.66%;left:53.32%;"
+                ></div>
+
+                <div
+                    class="cells safe"
+                    style="bottom:13.32%;left:53.32%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="bottom:19.98%;left:53.32%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="bottom:26.64%;left:53.32%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="bottom:33.3%;left:53.32%;"
+                ></div>
+
+
+                <!-- =================================
+                     RED HOME LANE
+                ================================== -->
+
+                <div
+                    class="cells arrow"
+                    style="bottom:0;left:46.66%;"
+                >
+                    &#8593;
+                </div>
+
+                <div
+                    class="cells cell-red"
+                    style="bottom:6.66%;left:46.66%;"
+                ></div>
+
+                <div
+                    class="cells cell-red"
+                    style="bottom:13.32%;left:46.66%;"
+                ></div>
+
+                <div
+                    class="cells cell-red"
+                    style="bottom:19.98%;left:46.66%;"
+                ></div>
+
+                <div
+                    class="cells cell-red"
+                    style="bottom:26.64%;left:46.66%;"
+                ></div>
+
+                <div
+                    class="cells cell-red"
+                    style="bottom:33.3%;left:46.66%;"
+                ></div>
+
+
+                <!-- =================================
+                     BOTTOM LEFT VERTICAL PATH
+                ================================== -->
+
+                <div
+                    class="cells"
+                    style="bottom:0;left:40%;"
+                ></div>
+
+                <div
+                    class="cells r-start"
+                    style="bottom:6.66%;left:40%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="bottom:13.32%;left:40%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="bottom:19.98%;left:40%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="bottom:26.64%;left:40%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="bottom:33.3%;left:40%;"
+                ></div>
+
+
+                <!-- =================================
+                     BOTTOM LEFT HORIZONTAL PATH
+                ================================== -->
+
+                <div
+                    class="cells"
+                    style="top:53.32%;left:33.3%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="top:53.32%;left:26.64%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="top:53.32%;left:19.98%;"
+                ></div>
+
+                <div
+                    class="cells safe"
+                    style="top:53.32%;left:13.32%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="top:53.32%;left:6.66%;"
+                ></div>
+
+                <div
+                    class="cells"
+                    style="top:53.32%;left:0;"
+                ></div>
+
+
+                <!-- =================================
+                     GREEN HOME LANE
+                ================================== -->
+
+                <div
+                    class="cells cell-green"
+                    style="top:46.66%;left:33.3%;"
+                ></div>
+
+                <div
+                    class="cells cell-green"
+                    style="top:46.66%;left:26.64%;"
+                ></div>
+
+                <div
+                    class="cells cell-green"
+                    style="top:46.66%;left:19.98%;"
+                ></div>
+
+                <div
+                    class="cells cell-green"
+                    style="top:46.66%;left:13.32%;"
+                ></div>
+
+                <div
+                    class="cells cell-green"
+                    style="top:46.66%;left:6.66%;"
+                ></div>
+
+                <div
+                    class="cells arrow"
+                    style="top:46.66%;left:0;"
+                >
+                    &#8594;
+                </div>
+
+
+                <!-- =================================
+                     PLAYER 1 COINS
+                ================================== -->
+
+                <div
+                    class="coin"
+                    id="player-coin-1"
+                    onclick="moveCoin(1)"
+                ></div>
+
+                <div
+                    class="coin"
+                    id="player-coin-2"
+                    onclick="moveCoin(2)"
+                ></div>
+
+                <div
+                    class="coin"
+                    id="player-coin-3"
+                    onclick="moveCoin(3)"
+                ></div>
+
+                <div
+                    class="coin"
+                    id="player-coin-4"
+                    onclick="moveCoin(4)"
+                ></div>
+
+
+                <!-- =================================
+                     PLAYER 2 COINS
+                ================================== -->
+
+                <div
+                    class="coin"
+                    id="opponent-coin-1"
+                ></div>
+
+                <div
+                    class="coin"
+                    id="opponent-coin-2"
+                ></div>
+
+                <div
+                    class="coin"
+                    id="opponent-coin-3"
+                ></div>
+
+                <div
+                    class="coin"
+                    id="opponent-coin-4"
+                ></div>
+
+
+            </div>
+
+
+            <!-- =================================
+                 DICE
+            ================================== -->
+
+            <div class="dice-wrapper">
+
+                <button
+                    type="button"
+                    id="rollBtn"
+                    class="dice-box"
+                    onclick="rollDice()"
+                >
+
+                    <div
+                        class="dice-number"
+                        id="diceResult"
+                    >
+                        -
+                    </div>
+
+                    <div class="dice-icon">
+                        🎲
+                    </div>
+
+                </button>
+
+            </div>
+
+
+            <!-- =================================
+                 GAME MESSAGE
+            ================================== -->
+
+            <div
+                id="gameMessage"
+                class="game-message"
+            >
+                Loading game...
+            </div>
+
+
+        </div>
+
+    </main>
+
+
+<!-- =====================================
+     WINNER RESULT MODAL
+====================================== -->
+
+<div
+    id="winnerModal"
+    class="winner-modal-overlay"
+>
+
+    <div class="winner-modal">
+
+        <div
+            id="winnerIcon"
+            class="winner-icon"
+        >
+            🏆
+        </div>
+
+
+        <h2 id="winnerTitle">
+            Winner
+        </h2>
+
+
+        <p id="winnerMessage">
+            Congratulations!
+        </p>
+
+
+        <button
+            type="button"
+            class="winner-ok-btn"
+            onclick="closeWinnerModal()"
+        >
+            OK
+        </button>
+
+    </div>
+
+</div>
+
+    <!-- =====================================
+         EXIT CONFIRMATION MODAL
+    ====================================== -->
+
+    <div
+        id="exitModal"
+        class="exit-modal-overlay"
+    >
+
+        <div class="exit-modal">
+
+            <h2>
+                Exit Match?
+            </h2>
+
+
+            <p>
+
+                If you exit this match,
+                you will lose the match.
+
+                Are you sure you want to exit?
+
+            </p>
+
+
+            <div class="exit-buttons">
+
+
+                <!-- EXIT -->
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'terminate_match',
+                        matchbatchnumber=
+                            match.matchbatchnumber
+                    ) }}"
+                >
+
+                    <button
+                        type="submit"
+                        class="exit-confirm-btn"
+                    >
+
+                        Exit
+
+                    </button>
+
+                </form>
+
+
+                <!-- CONTINUE -->
+
+                <button
+                    type="button"
+                    class="continue-game-btn"
+                    onclick="closeExitModal()"
+                >
+
+                    Continue Game
+
+                </button>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+<audio
+    id="backgroundMusic"
+    loop
+    preload="auto"
+>
+    <source
+        src="{{ url_for('static', filename='audio/background.mp3') }}"
+        type="audio/mpeg"
+    >
+</audio>
+
+
+<audio
+    id="diceSound"
+    preload="auto"
+>
+    <source
+        src="{{ url_for('static', filename='audio/dice.mp3') }}"
+        type="audio/mpeg"
+    >
+</audio>
+
+
+    <!-- =====================================
+         JAVASCRIPT VARIABLES
+    ====================================== -->
+
+    <script>
+
+        const myUserId =
+    {{ session["userid"] | tojson }};
+
+const batchId =
+    {{ match.matchbatchnumber | tojson }};
+
+const playerColor =
+    "{{ player_color }}";
+
+const opponentColor =
+    "{{ opponent_color }}";
+
+
+/*
+ * These variables are intentionally
+ * available for the game JavaScript
+ * that we will connect next.
+ */
+
+let currentTurn = null;
+
+let lastDice = null;
+
+let mustMove = false;
+
+let gameOver = false;
+
+let winnerPopupShown = false;
+
+let diceRolling = false;
+
+let matchPlayer1Uuid = null;
+
+let matchPlayer2Uuid = null;
+
+
+/* =================================
+   AUTHORITATIVE PLAYER → COLOR MAP
+================================= */
+
+let playerColorsByUuid = {};
+
+
+/* =================================
+   FIXED BOARD COLOR PLACEMENT
+
+   TOP LEFT     = GREEN
+   TOP RIGHT    = YELLOW
+   BOTTOM LEFT  = RED
+   BOTTOM RIGHT = BLUE
+================================= */
+
+function applyHouseColor(
+    houseId,
+    color
+) {
+
+    const house =
+        document.getElementById(
+            houseId
+        );
+
+
+    if (!house || !color) {
+        return;
+    }
+
+
+    house.classList.add(
+        "house-" + color
+    );
+
+
+    const squares =
+        house.querySelectorAll(
+            ".square"
+        );
+
+
+    squares.forEach(
+        function(square) {
+
+            square.classList.add(
+                "square-" + color
+            );
+
+        }
+    );
+
+}
+
+
+/* =================================
+   FIXED HOUSE COLORS
+================================= */
+
+applyHouseColor(
+    "houseTopLeft",
+    "green"
+);
+
+applyHouseColor(
+    "houseTopRight",
+    "yellow"
+);
+
+applyHouseColor(
+    "houseBottomLeft",
+    "red"
+);
+
+applyHouseColor(
+    "houseBottomRight",
+    "blue"
+);
+
+
+/* =================================
+   FIXED BOARD COLORS
+================================= */
+
+const colorValues = {
+
+    green:
+        "#66bb6a",
+
+    red:
+        "#e53935",
+
+    yellow:
+        "#fff176",
+
+    blue:
+        "#29b6f6"
+
+};
+
+
+const board =
+    document.getElementById(
+        "ludoBoard"
+    );
+
+
+if (board) {
+
+    board.style.setProperty(
+        "--board-top-color",
+        colorValues.yellow
+    );
+
+    board.style.setProperty(
+        "--board-right-color",
+        colorValues.blue
+    );
+
+    board.style.setProperty(
+        "--board-bottom-color",
+        colorValues.red
+    );
+
+    board.style.setProperty(
+        "--board-left-color",
+        colorValues.green
+    );
+
+}
+
+
+/* =================================
+   COIN COLORS
+================================= */
+
+document
+    .querySelectorAll(
+        ".coin"
+    )
+    .forEach(
+        function(coin) {
+
+            if (
+                coin.id.startsWith(
+                    "player-"
+                )
+            ) {
+
+                coin.classList.add(
+                    "coin-" +
+                    playerColor
+                );
+
+            }
+
+            else {
+
+                coin.classList.add(
+                    "coin-" +
+                    opponentColor
+                );
+
+            }
+
+        }
+    );
+
+
+/* =================================
+   EXIT MODAL
+================================= */
+
+function openExitModal() {
+
+    document.getElementById(
+        "exitModal"
+    ).style.display = "flex";
+
+}
+
+
+function closeExitModal() {
+
+    document.getElementById(
+        "exitModal"
+    ).style.display = "none";
+
+}
+
+
+document.getElementById(
+    "exitModal"
+).addEventListener(
+    "click",
+    function(event) {
+
+        if (
+            event.target === this
+        ) {
+
+            closeExitModal();
+
+        }
+
+    }
+);
+
+
+/* =========================================
+   ROLL DICE
+========================================= */
+
+async function rollDice() {
+
+    if (
+        diceRolling ||
+        gameOver
+    ) {
+
+        return;
+
+    }
+
+
+    diceRolling = true;
+
+    playDiceSound();
+
+    const rollButton =
+        document.getElementById(
+            "rollBtn"
+        );
+
+
+    const diceResult =
+        document.getElementById(
+            "diceResult"
+        );
+
+
+    const gameMessage =
+        document.getElementById(
+            "gameMessage"
+        );
+
+
+    rollButton.disabled = true;
+
+
+    gameMessage.textContent =
+        "Rolling dice...";
+
+
+    try {
+
+        const response =
+            await fetch(
+                `/ludo-roll-dice/${batchId}`,
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    }
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        /* ==============================
+           SERVER ERROR
+        ============================== */
+
+        if (
+            !response.ok ||
+            !data.success
+        ) {
+
+            gameMessage.textContent =
+                data.message ||
+                "Unable to roll dice.";
+
+            return;
+
+        }
+
+
+        /* ==============================
+           DICE RESULT
+        ============================== */
+
+        lastDice =
+            data.dice;
+
+
+        diceResult.textContent =
+            data.dice;
+
+
+        /* ==============================
+           CONSECUTIVE SIX
+        ============================== */
+
+        if (
+            data.consecutive6 !== undefined
+        ) {
+
+            gameMessage.textContent =
+                "You rolled " +
+                data.dice +
+                ".";
+
+        }
+
+        else {
+
+            gameMessage.textContent =
+                "You rolled " +
+                data.dice +
+                ".";
+
+        }
+
+
+        /* ==============================
+           MOVE REQUIRED
+        ============================== */
+
+        if (
+            data.mustmove
+        ) {
+
+            gameMessage.textContent =
+                "You rolled " +
+                data.dice +
+                ". Select a coin to move.";
+
+        }
+
+
+        /* ==============================
+           NEXT TURN
+        ============================== */
+
+        if (
+            data.nextturnuuid &&
+            data.nextturnuuid !== myUserId
+        ) {
+
+            gameMessage.textContent =
+                "Waiting for opponent.";
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Dice roll error:",
+            error
+        );
+
+
+        gameMessage.textContent =
+            "Unable to connect to the game.";
+
+    }
+
+    finally {
+
+        diceRolling = false;
+
+
+        /*
+         * Do not permanently enable the
+         * button here.
+         *
+         * The server's game state will
+         * determine whether rolling is
+         * allowed.
+         */
+
+        if (
+            !mustMove &&
+            !gameOver
+        ) {
+
+            rollButton.disabled = false;
+
+        }
+
+    }
+
+}
+
+
+
+
+/* =========================================
+   BOARD POSITION HELPER
+========================================= */
+
+function placeCoinAt(
+    coinElement,
+    top,
+    left
+) {
+
+    if (!coinElement) {
+
+        return;
+
+    }
+
+
+    coinElement.style.top =
+        top;
+
+    coinElement.style.left =
+        left;
+
+}
+
+
+/* =========================================
+   FIXED COLOR HOME POSITIONS
+========================================= */
+
+const colorHomePositions = {
+
+    green: {
+
+        1: {
+            top: "15%",
+            left: "15%"
+        },
+
+        2: {
+            top: "15%",
+            left: "24.5%"
+        },
+
+        3: {
+            top: "24%",
+            left: "15%"
+        },
+
+        4: {
+            top: "24%",
+            left: "24.5%"
+        }
+
+    },
+
+
+    yellow: {
+
+        1: {
+            top: "15%",
+            left: "75%"
+        },
+
+        2: {
+            top: "15%",
+            left: "84.5%"
+        },
+
+        3: {
+            top: "24%",
+            left: "75%"
+        },
+
+        4: {
+            top: "24%",
+            left: "84.5%"
+        }
+
+    },
+
+
+    red: {
+
+        1: {
+            top: "75%",
+            left: "15%"
+        },
+
+        2: {
+            top: "75%",
+            left: "24.5%"
+        },
+
+        3: {
+            top: "84%",
+            left: "15%"
+        },
+
+        4: {
+            top: "84%",
+            left: "24.5%"
+        }
+
+    },
+
+
+    blue: {
+
+        1: {
+            top: "75%",
+            left: "75%"
+        },
+
+        2: {
+            top: "75%",
+            left: "84.5%"
+        },
+
+        3: {
+            top: "84%",
+            left: "75%"
+        },
+
+        4: {
+            top: "84%",
+            left: "84.5%"
+        }
+
+    }
+
+};
+
+
+/* =========================================
+   PLACE INITIAL COINS
+========================================= */
+
+function placeInitialCoins() {
+
+    for (
+        let i = 1;
+        i <= 4;
+        i++
+    ) {
+
+        const playerCoin =
+            document.getElementById(
+                "player-coin-" + i
+            );
+
+
+        const opponentCoin =
+            document.getElementById(
+                "opponent-coin-" + i
+            );
+
+
+        if (playerCoin) {
+
+            const positions =
+                colorHomePositions[
+                    playerColor
+                ];
+
+
+            if (
+                positions &&
+                positions[i]
+            ) {
+
+                placeCoinAt(
+                    playerCoin,
+                    positions[i].top,
+                    positions[i].left
+                );
+
+            }
+
+        }
+
+
+        if (opponentCoin) {
+
+            const positions =
+                colorHomePositions[
+                    opponentColor
+                ];
+
+
+            if (
+                positions &&
+                positions[i]
+            ) {
+
+                placeCoinAt(
+                    opponentCoin,
+                    positions[i].top,
+                    positions[i].left
+                );
+
+            }
+
+        }
+
+    }
+
+}
+
+
+/* =========================================
+   SHOW WINNER POPUP
+========================================= */
+
+function showWinnerPopup(
+    endReason
+) {
+
+    /*
+     * Prevent the popup from appearing
+     * repeatedly because syncGame()
+     * runs continuously.
+     */
+    if (
+        winnerPopupShown
+    ) {
+
+        return;
+
+    }
+
+
+    winnerPopupShown = true;
+
+
+    const modal =
+        document.getElementById(
+            "winnerModal"
+        );
+
+
+    const title =
+        document.getElementById(
+            "winnerTitle"
+        );
+
+
+    const message =
+        document.getElementById(
+            "winnerMessage"
+        );
+
+
+    if (
+        !modal ||
+        !title ||
+        !message
+    ) {
+
+        return;
+
+    }
+
+
+    /* =====================================
+       NORMAL WIN
+    ===================================== */
+
+    if (
+        endReason === "won"
+    ) {
+
+        title.textContent =
+            "Winner";
+
+        message.textContent =
+            "Congratulations! You won the match.";
+
+    }
+
+
+    /* =====================================
+       OPPONENT LEFT
+    ===================================== */
+
+    else if (
+        endReason === "opponent_left"
+    ) {
+
+        title.textContent =
+            "Winner";
+
+        message.textContent =
+            "Opponent left the match.";
+
+    }
+
+
+    /* =====================================
+       OPPONENT INACTIVE
+    ===================================== */
+
+    else if (
+        endReason === "opponent_inactive"
+    ) {
+
+        title.textContent =
+            "Winner";
+
+        message.textContent =
+            "Opponent left and was not active.";
+
+    }
+
+
+    /* =====================================
+       FALLBACK
+    ===================================== */
+
+    else {
+
+        title.textContent =
+            "Winner";
+
+        message.textContent =
+            "You won the match.";
+
+    }
+
+
+    modal.classList.add(
+        "active"
+    );
+
+}
+
+
+/* =========================================
+   CLOSE WINNER POPUP
+========================================= */
+
+function closeWinnerModal() {
+
+    const modal =
+        document.getElementById(
+            "winnerModal"
+        );
+
+
+    if (modal) {
+
+        modal.classList.remove(
+            "active"
+        );
+
+    }
+
+
+    /*
+     * After the user acknowledges
+     * the result, return to dashboard.
+     */
+    window.location.href =
+        "/classic-dashboard";
+
+}
+
+
+/* =========================================
+   SYNC GAME STATE
+========================================= */
+
+async function syncGame() {
+
+    try {
+
+        const response =
+            await fetch(
+                `/ludo-game-state/${batchId}`
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            !response.ok ||
+            !data.success
+        ) {
+
+            console.error(
+                "Game state error:",
+                data.message
+            );
+
+            return;
+
+        }
+
+
+        /* ==============================
+           MATCH STATUS
+        ============================== */
+
+       /* ==============================
+   MATCH STATUS
+============================== */
+
+if (
+    data.match.terminated
+) {
+
+    gameOver = true;
+
+
+    /*
+     * =====================================
+     * CHECK WHETHER I AM THE WINNER
+     * =====================================
+     */
+
+    if (
+        data.match.winner ===
+        myUserId
+    ) {
+
+        showWinnerPopup(
+            data.match.end_reason
+        );
+
+    }
+
+
+    /*
+     * =====================================
+     * LOSER / OTHER SCREEN
+     * =====================================
+     */
+
+    else {
+
+        document.getElementById(
+            "gameMessage"
+        ).textContent =
+            "Match has ended.";
+
+    }
+
+
+    return;
+}
+
+
+        /* ==============================
+           GAME STATE
+        ============================== */
+
+        const game =
+            data.game;
+
+
+        matchPlayer1Uuid =
+            data.match.player1.uuid;
+
+
+        matchPlayer2Uuid =
+            data.match.player2.uuid;
+
+
+        /* =========================================
+           AUTHORITATIVE PLAYER → COLOR MAPPING
+        ========================================= */
+
+        playerColorsByUuid = {
+
+            [data.match.player1.uuid]:
+                data.match.player1.color,
+
+            [data.match.player2.uuid]:
+                data.match.player2.color
+
+        };
+
+
+        lastDice =
+            game.last_dice;
+
+
+        mustMove =
+            Boolean(
+                game.move_pending
+            );
+
+
+        currentTurn =
+            game.current_turn;
+
+
+        /* ==============================
+           DICE DISPLAY
+        ============================== */
+
+        const diceResult =
+            document.getElementById(
+                "diceResult"
+            );
+
+
+        if (
+            game.last_dice !== null &&
+            game.last_dice !== undefined
+        ) {
+
+            diceResult.textContent =
+                game.last_dice;
+
+        }
+
+
+        /* ==============================
+           TURN
+        ============================== */
+
+        const turnDisplay =
+            document.getElementById(
+                "turnDisplay"
+            );
+
+
+        if (
+            game.current_turn ===
+            myUserId
+        ) {
+
+            turnDisplay.textContent =
+                "Your Turn";
+
+        }
+
+        else {
+
+            turnDisplay.textContent =
+                "Opponent's Turn";
+
+        }
+
+
+        /* ==============================
+           RENDER COINS
+        ============================== */
+
+        if (
+            Array.isArray(
+                data.coins
+            )
+        ) {
+
+            renderCoins(
+                data.coins
+            );
+
+        }
+
+
+        /* ==============================
+           ROLL BUTTON
+        ============================== */
+
+        const rollButton =
+            document.getElementById(
+                "rollBtn"
+            );
+
+
+        if (
+            game.current_turn ===
+                myUserId &&
+
+            !mustMove &&
+
+            !gameOver
+        ) {
+
+            rollButton.disabled =
+                false;
+
+        }
+
+        else {
+
+            rollButton.disabled =
+                true;
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Game synchronization error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   RENDER COINS FROM DATABASE
+   WITH RESPONSIVE STACKING
+========================================= */
+
+function renderCoins(coins) {
+
+    /*
+     * Reset every coin before rendering.
+     *
+     * syncGame() runs repeatedly, so any
+     * previous stacking must be removed first.
+     */
+    document
+        .querySelectorAll(".coin")
+        .forEach(
+            function(element) {
+
+                element.style.width = "";
+                element.style.height = "";
+                element.style.transform = "";
+                element.style.zIndex = "999";
+
+            }
+        );
+
+
+    /*
+     * Store every rendered coin and its
+     * actual visual board position.
+     */
+    const renderedCoins = [];
+
+
+    /* =====================================
+       FIRST PASS
+       CALCULATE EVERY COIN POSITION
+    ===================================== */
+
+    coins.forEach(
+        function(coin) {
+
+            const isMine =
+                coin.playeruuid === myUserId;
+
+
+            const coinId =
+                isMine
+                    ? "player-coin-" +
+                      coin.coinindex
+                    : "opponent-coin-" +
+                      coin.coinindex;
+
+
+            const element =
+                document.getElementById(
+                    coinId
+                );
+
+
+            if (!element) {
+                return;
+            }
+
+
+            /* ==============================
+               COIN IN HOME
+            ============================== */
+
+            if (
+                Number(
+                    coin.position
+                ) === -1
+            ) {
+
+                const coinColor =
+                    playerColorsByUuid[
+                        coin.playeruuid
+                    ];
+
+
+                const positions =
+                    colorHomePositions[
+                        coinColor
+                    ];
+
+
+                if (!positions) {
+
+                    console.warn(
+                        "Unknown coin color:",
+                        coinColor
+                    );
+
+                    return;
+                }
+
+
+                const home =
+                    positions[
+                        coin.coinindex
+                    ];
+
+
+                if (!home) {
+
+                    console.warn(
+                        "Invalid coin index:",
+                        coin.coinindex
+                    );
+
+                    return;
+                }
+
+
+                placeCoinAt(
+                    element,
+                    home.top,
+                    home.left
+                );
+
+
+                /*
+                 * Home coins are not stacked.
+                 */
+                renderedCoins.push({
+
+                    element:
+                        element,
+
+                    top:
+                        home.top,
+
+                    left:
+                        home.left,
+
+                    coin:
+                        coin,
+
+                    isMine:
+                        isMine
+
+                });
+
+                return;
+            }
+
+
+            /* ==============================
+               COIN ON BOARD
+            ============================== */
+
+            const visualPosition =
+                getVisualPosition(
+                    Number(
+                        coin.position
+                    ),
+                    coin.playeruuid
+                );
+
+
+            if (!visualPosition) {
+
+                console.warn(
+                    "Invalid coin position:",
+                    coin.position
+                );
+
+                return;
+            }
+
+
+            placeCoinAt(
+                element,
+                visualPosition.top,
+                visualPosition.left
+            );
+
+
+            renderedCoins.push({
+
+                element:
+                    element,
+
+                top:
+                    visualPosition.top,
+
+                left:
+                    visualPosition.left,
+
+                coin:
+                    coin,
+
+                isMine:
+                    isMine
+
+            });
+
+        }
+    );
+
+
+    /* =====================================
+       GROUP COINS BY EXACT VISUAL CELL
+    ===================================== */
+
+    const positionGroups = {};
+
+
+    renderedCoins.forEach(
+        function(item) {
+
+            const top =
+                parseFloat(
+                    item.top
+                );
+
+            const left =
+                parseFloat(
+                    item.left
+                );
+
+
+            /*
+             * Round the coordinates so
+             * tiny floating-point differences
+             * don't create separate groups.
+             */
+            const key =
+                top.toFixed(2) +
+                "_" +
+                left.toFixed(2);
+
+
+            if (
+                !positionGroups[key]
+            ) {
+
+                positionGroups[key] = [];
+
+            }
+
+
+            positionGroups[key].push(
+                item
+            );
+
+        }
+    );
+
+
+    /* =====================================
+       APPLY STACKING
+    ===================================== */
+
+    Object.values(
+        positionGroups
+    ).forEach(
+        function(group) {
+
+
+            /*
+             * =================================
+             * SINGLE COIN
+             * =================================
+             */
+
+            if (
+                group.length === 1
+            ) {
+
+                const item =
+                    group[0];
+
+
+                /*
+                 * Restore normal coin size.
+                 */
+                item.element.style.width =
+                    "";
+
+                item.element.style.height =
+                    "";
+
+                item.element.style.transform =
+                    "";
+
+                item.element.style.zIndex =
+                    "999";
+
+
+                return;
+            }
+
+
+            /*
+             * =================================
+             * MULTIPLE COINS
+             * =================================
+             */
+
+            const count =
+                group.length;
+
+
+            /*
+             * These are PIXEL offsets.
+             *
+             * This is important:
+             *
+             * Using percentages inside
+             * transform() was causing the
+             * coins to barely move because
+             * transform percentages are
+             * relative to the coin itself.
+             *
+             * Pixel offsets are therefore
+             * calculated from the actual
+             * board size below.
+             */
+            let positions = [];
+
+
+            /* =================================
+               TWO COINS
+            ================================= */
+
+            if (
+                count === 2
+            ) {
+
+                positions = [
+
+                    {
+                        x: -8,
+                        y: 0
+                    },
+
+                    {
+                        x: 8,
+                        y: 0
+                    }
+
+                ];
+
+            }
+
+
+            /* =================================
+               THREE COINS
+            ================================= */
+
+            else if (
+                count === 3
+            ) {
+
+                positions = [
+
+                    {
+                        x: -8,
+                        y: 6
+                    },
+
+                    {
+                        x: 8,
+                        y: 6
+                    },
+
+                    {
+                        x: 0,
+                        y: -8
+                    }
+
+                ];
+
+            }
+
+
+            /* =================================
+               FOUR COINS
+            ================================= */
+
+            else {
+
+                positions = [
+
+                    {
+                        x: -7,
+                        y: -7
+                    },
+
+                    {
+                        x: 7,
+                        y: -7
+                    },
+
+                    {
+                        x: -7,
+                        y: 7
+                    },
+
+                    {
+                        x: 7,
+                        y: 7
+                    }
+
+                ];
+
+            }
+
+
+            /*
+             * =================================
+             * SCALE OFFSETS WITH BOARD SIZE
+             * =================================
+             *
+             * The board can change size on
+             * mobile/desktop.
+             *
+             * We therefore calculate a scale
+             * factor from the actual board
+             * width.
+             */
+
+            const firstElement =
+                group[0].element;
+
+
+            const board =
+                firstElement.closest(
+                    ".ludo-board"
+                ) ||
+                firstElement.closest(
+                    ".board"
+                ) ||
+                firstElement.parentElement;
+
+
+            let scale = 1;
+
+
+            if (board) {
+
+                /*
+                 * 450px is approximately the
+                 * reference board size.
+                 */
+                scale =
+                    board.offsetWidth /
+                    450;
+
+            }
+
+
+            /*
+             * Keep the scale within a
+             * sensible range.
+             */
+            scale =
+                Math.max(
+                    0.75,
+                    Math.min(
+                        scale,
+                        1.5
+                    )
+                );
+
+
+            /* =================================
+               APPLY TO EACH COIN
+            ================================= */
+
+            group.forEach(
+                function(item, index) {
+
+                    const offset =
+                        positions[index] ||
+                        positions[
+                            positions.length - 1
+                        ];
+
+
+                    /*
+                     * Make stacked coins slightly
+                     * smaller so the group fits
+                     * inside the cell.
+                     */
+                    if (
+                        count >= 4
+                    ) {
+
+                        item.element.style.width =
+                            "5.0%";
+
+                        item.element.style.height =
+                            "5.0%";
+
+                    }
+                    else {
+
+                        item.element.style.width =
+                            "5.3%";
+
+                        item.element.style.height =
+                            "5.3%";
+
+                    }
+
+
+                    /*
+                     * IMPORTANT:
+                     *
+                     * Use PX here, NOT %.
+                     *
+                     * The -50% keeps the coin
+                     * centered on its original
+                     * board position.
+                     *
+                     * The additional PX value
+                     * separates the coins.
+                     */
+                    const x =
+                        Math.round(
+                            offset.x *
+                            scale
+                        );
+
+
+                    const y =
+                        Math.round(
+                            offset.y *
+                            scale
+                        );
+
+
+                    item.element.style.transform =
+                        "translate(" +
+                        "calc(-50% + " +
+                        x +
+                        "px), " +
+                        "calc(-50% + " +
+                        y +
+                        "px)" +
+                        ")";
+
+
+                    /*
+                     * Different z-index values
+                     * keep each coin clickable.
+                     */
+                    item.element.style.zIndex =
+                        String(
+                            1000 + index
+                        );
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================
+   MOVE COIN
+========================================= */
+
+async function moveCoin(
+    coinIndex
+) {
+
+    /*
+     * Only the player whose turn
+     * it is should be able to move.
+     */
+
+    if (gameOver) {
+
+        return;
+
+    }
+
+
+    if (!mustMove) {
+
+        document.getElementById(
+            "gameMessage"
+        ).textContent =
+            "Roll the dice first.";
+
+        return;
+
+    }
+
+
+    /*
+     * Make sure it is actually
+     * our turn.
+     */
+
+    if (
+        currentTurn !==
+        myUserId
+    ) {
+
+        document.getElementById(
+            "gameMessage"
+        ).textContent =
+            "It is not your turn.";
+
+        return;
+
+    }
+
+
+    try {
+
+        /*
+         * Prevent multiple clicks
+         * while the server is
+         * processing the move.
+         */
+
+        mustMove = false;
+
+
+        const response =
+            await fetch(
+                `/ludo-move-coin/${batchId}`,
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            coinindex:
+                                coinIndex
+
+                        })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        /* ==============================
+           SERVER ERROR
+        ============================== */
+
+        if (
+            !response.ok ||
+            !data.success
+        ) {
+
+            /*
+             * Restore the move state
+             * because the move did not
+             * actually happen.
+             */
+
+            mustMove = true;
+
+
+            document.getElementById(
+                "gameMessage"
+            ).textContent =
+                data.message ||
+                "Unable to move coin.";
+
+
+            return;
+
+        }
+
+
+        /* ==============================
+           SUCCESS
+        ============================== */
+
+        document.getElementById(
+            "gameMessage"
+        ).textContent =
+            "Coin moved.";
+
+
+        /*
+         * Do not manually modify the
+         * coin position here.
+         *
+         * The database is the authority.
+         *
+         * syncGame() fetches the
+         * updated position.
+         */
+
+        await syncGame();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Coin movement error:",
+            error
+        );
+
+
+        mustMove = true;
+
+
+        document.getElementById(
+            "gameMessage"
+        ).textContent =
+            "Unable to connect to the game.";
+
+    }
+
+}
+
+
+/* =========================================
+   INITIAL GAME SYNC
+========================================= */
+
+syncGame();
+
+
+setInterval(
+    syncGame,
+    1000
+);
+
+
+/* =========================================
+   AUTHORITATIVE LUDO MAIN PATH
+
+   FIXED BOARD:
+
+   GREEN       YELLOW
+
+   RED         BLUE
+
+   LOGICAL STARTS:
+
+   RED    = 0
+   GREEN  = 12
+   YELLOW = 25
+   BLUE   = 38
+
+   Every player uses this SAME physical
+   board path on BOTH screens.
+========================================= */
+
+const mainPath = [
+
+    /* =====================================
+       0
+       RED START
+    ===================================== */
+
+    { top: "89.75%", left: "43.37%" },
+
+
+    /* =====================================
+       1 - 4
+       RED SIDE
+    ===================================== */
+
+    {
+        top: "83.13%",
+        left: "43.37%"
+    },
+
+    {
+        top: "76.51%",
+        left: "43.37%"
+    },
+
+    {
+        top: "69.90%",
+        left: "43.37%"
+    },
+
+    {
+        top: "63.28%",
+        left: "43.37%"
+    },
+
+
+    /* =====================================
+       5 - 11
+       BOTTOM-LEFT → LEFT SIDE
+    ===================================== */
+
+    {
+        top: "56.61%",
+        left: "36.72%"
+    },
+
+    {
+        top: "56.61%",
+        left: "30.10%"
+    },
+
+    {
+        top: "56.61%",
+        left: "23.49%"
+    },
+
+    {
+        top: "56.61%",
+        left: "16.87%"
+    },
+
+    {
+        top: "56.61%",
+        left: "10.25%"
+    },
+
+
+    {
+        top: "56.61%",
+        left: "3.64%"
+    },
+
+    {
+        top: "49.99%",
+        left: "3.64%"
+    },
+
+     { top: "43.37%", left: "3.64%" },
+    /* =====================================
+       13
+       GREEN START
+    ===================================== */
+
+    { top: "43.38%", left: "10.25%" },
+
+    /* =====================================
+       14 - 17
+       GREEN SIDE
+    ===================================== */
+
+    {
+        top: "43.37%",
+        left: "16.87%"
+    },
+
+    {
+        top: "43.37%",
+        left: "23.49%"
+    },
+
+    {
+        top: "43.37%",
+        left: "30.10%"
+    },
+
+    {
+        top: "43.37%",
+        left: "36.72%"
+    },
+
+    {
+        top: "33.30%",
+        left: "43.37%"
+    },
+
+
+    /* =====================================
+       18 - 24
+       LEFT → TOP
+    ===================================== */
+
+    {
+        top: "36.72%",
+        left: "43.37%"
+    },
+
+    {
+        top: "30.10%",
+        left: "43.37%"
+    },
+
+    {
+        top: "23.49%",
+        left: "43.37%"
+    },
+
+    {
+        top: "16.87%",
+        left: "43.37%"
+    },
+
+    {
+        top: "3.64%",
+        left: "43.37%"
+    },
+
+    {
+        top: "3.64%",
+        left: "49.99%"
+    },
+
+    {
+        top: "3.64%",
+        left: "56.61%"
+    },
+
+
+    /* =====================================
+       25
+       YELLOW START
+    ===================================== */
+
+    { top: "10.25%", left: "56.61%" },
+
+
+    /* =====================================
+       26 - 29
+       YELLOW SIDE
+    ===================================== */
+
+    {
+        top: "16.87%",
+        left: "56.61%"
+    },
+
+    {
+        top: "23.49%",
+        left: "56.61%"
+    },
+
+    {
+        top: "30.10%",
+        left: "56.61%"
+    },
+
+    {
+        top: "36.72%",
+        left: "56.61%"
+    },
+
+
+    /* =====================================
+       30 - 37              yaha se 
+       RIGHT SIDE
+    ===================================== */
+
+    {
+        top: "43.37%",
+        left: "63.28%"
+    },
+
+    {
+        top: "43.37%",
+        left: "69.90%"
+    },
+
+    {
+        top: "43.37%",
+        left: "76.51%"
+    },
+
+    {
+        top: "43.37%",
+        left: "83.13%"
+    },
+
+    {
+        top: "43.37%",
+        left: "89.75%"
+    },
+
+    {
+        top: "43.37%",
+        left: "96.36%"
+    },
+
+    {
+        top: "49.99%",
+        left: "96.36%"
+    },
+
+    {
+        top: "56.61%",
+        left: "96.36%"
+    },
+
+
+    /* =====================================
+       38                      yaha se
+       BLUE START
+    ===================================== */
+
+    { top: "56.61%", left: "89.75%" },
+
+
+    /* =====================================
+       39 - 42
+       BLUE SIDE
+    ===================================== */
+
+    {
+        top: "56.61%",
+        left: "83.13%"
+    },
+
+    {
+        top: "56.61%",
+        left: "76.51%"
+    },
+
+    {
+        top: "56.61%",
+        left: "69.90%"
+    },
+
+    {
+        top: "56.61%",
+        left: "63.28%"
+    },
+
+
+    /* =====================================
+       43 - 47
+       BOTTOM-RIGHT
+    ===================================== */
+
+    {
+        top: "63.28%",
+        left: "56.61%"
+    },
+
+    {
+        top: "69.90%",
+        left: "56.61%"
+    },
+
+    {
+        top: "76.51%",
+        left: "56.61%"
+    },
+
+    {
+        top: "83.13%",
+        left: "56.61%"
+    },
+
+    {
+        top: "89.75%",
+        left: "56.61%"
+    },
+
+
+    /* =====================================
+       48 - 51
+       BOTTOM → RED SIDE
+    ===================================== */
+
+    {
+        top: "96.36%",
+        left: "56.61%"
+    },
+
+    {
+        top: "96.36%",
+        left: "49.99%"
+    },
+
+    {
+        top: "96.36%",
+        left: "43.37%"
+    },
+
+    
+
+];
+
+
+/* =========================================
+   COLOR BASED START POSITIONS
+========================================= */
+
+const COLOR_START_POSITIONS = {
+
+    red: 0,
+
+    green: 13,
+
+    yellow: 26,
+
+    blue: 39
+
+};
+
+
+/* =========================================
+   GET PLAYER START POSITION
+   BASED ON ACTUAL PLAYER COLOR
+========================================= */
+
+function getPlayerStartPosition(
+    playerUuid
+) {
+
+    const color =
+        playerColorsByUuid[
+            playerUuid
+        ];
+
+
+    if (!color) {
+
+        return null;
+
+    }
+
+
+    return (
+        COLOR_START_POSITIONS[
+            color
+        ] ?? null
+    );
+
+}
+
+
+/* =========================================
+   COLOR HOME LANES
+========================================= */
+
+const colorHomeLanes = {
+
+    yellow: [
+
+        { top: "10.25%", left: "49.99%" },
+
+        { top: "16.87%", left: "49.99%" },
+
+        { top: "23.49%", left: "49.99%" },
+
+        { top: "30.10%", left: "49.99%" },
+
+        { top: "36.72%", left: "49.99%" }
+
+    ],
+
+
+    blue: [
+
+        { top: "49.99%", left: "89.75%" },
+
+       { top: "49.99%", left: "83.13%" },
+
+        { top: "49.99%", left: "76.51%" },
+
+        { top: "49.99%", left: "69.90%" },
+
+        { top: "49.99%", left: "63.28%" }
+
+    ],
+
+
+    red: [
+
+       { top: "89.75%", left: "49.99%" },
+
+       { top: "83.13%", left: "49.99%" },
+
+        { top: "76.51%", left: "49.99%" },
+
+        { top: "69.90%", left: "49.99%" },
+
+        { top: "63.28%", left: "49.99%" }
+
+    ],
+
+
+    green: [
+
+        { top: "49.99%", left: "10.25%" },
+
+        { top: "49.99%", left: "16.87%" },
+
+        { top: "49.99%", left: "23.49%" },
+
+       { top: "49.99%", left: "30.10%" },
+
+        { top: "49.99%", left: "36.72%" }
+
+    ]
+
+};
+
+
+/* =========================================
+   FINAL CENTER POSITION
+========================================= */
+
+const FINAL_HOME_POSITION = {
+
+    top: "46.66%",
+
+    left: "49%"
+
+};
+
+
+/* =========================================
+   GET BOARD POSITION
+========================================= */
+
+function getBoardCoordinate(
+    position
+) {
+
+    if (
+        position < 0 ||
+        position >= mainPath.length
+    ) {
+
+        return null;
+
+    }
+
+
+    return mainPath[
+        position
+    ];
+
+}
+
+
+/* =========================================
+   GET VISUAL POSITION
+========================================= */
+
+function getVisualPosition(
+    logicalPosition,
+    playerUuid
+) {
+
+    logicalPosition =
+        Number(
+            logicalPosition
+        );
+
+
+    /* =====================================
+       FINAL CENTER
+       57
+    ===================================== */
+
+    if (
+        logicalPosition === 57
+    ) {
+
+        return {
+
+            top:
+                FINAL_HOME_POSITION.top,
+
+            left:
+                FINAL_HOME_POSITION.left
+
+        };
+
+    }
+
+
+    /* =====================================
+       HOME LANE
+       52 - 56
+    ===================================== */
+
+    if (
+        logicalPosition >= 52 &&
+        logicalPosition <= 56
+    ) {
+
+        /*
+         * IMPORTANT:
+         *
+         * Determine the home lane
+         * from the actual player's
+         * assigned color.
+         *
+         * Never use:
+         *
+         * playerColor
+         * opponentColor
+         *
+         * based on the viewer.
+         */
+
+        const playerColorForLane =
+            playerColorsByUuid[
+                playerUuid
+            ];
+
+
+        if (
+            !playerColorForLane
+        ) {
+
+            return null;
+
+        }
+
+
+        const lane =
+            colorHomeLanes[
+                playerColorForLane
+            ];
+
+
+        if (!lane) {
+
+            return null;
+
+        }
+
+
+        const laneIndex =
+            logicalPosition - 52;
+
+
+        const coordinate =
+            lane[
+                laneIndex
+            ];
+
+
+        if (!coordinate) {
+
+            return null;
+
+        }
+
+
+        return {
+
+            top:
+                coordinate.top,
+
+            left:
+                coordinate.left
+
+        };
+
+    }
+
+
+    /* =====================================
+       MAIN 52-CELL TRACK
+       0 - 51
+    ===================================== */
+
+    const physicalPosition =
+        getPlayerPathPosition(
+            logicalPosition,
+            playerUuid
+        );
+
+
+    if (
+        physicalPosition === null
+    ) {
+
+        return null;
+
+    }
+
+
+    const coordinate =
+        getBoardCoordinate(
+            physicalPosition
+        );
+
+
+    if (!coordinate) {
+
+        return null;
+
+    }
+
+
+    return {
+
+        top:
+            coordinate.top,
+
+        left:
+            coordinate.left
+
+    };
+
+}
+
+
+/* =========================================
+   GET PLAYER PHYSICAL PATH POSITION
+========================================= */
+
+function getPlayerPathPosition(
+    logicalPosition,
+    playerUuid
+) {
+
+    if (
+        logicalPosition < 0 ||
+        logicalPosition > 51
+    ) {
+
+        return null;
+
+    }
+
+
+    const startPosition =
+        getPlayerStartPosition(
+            playerUuid
+        );
+
+
+    if (
+        startPosition === null ||
+        startPosition === undefined
+    ) {
+
+        return null;
+
+    }
+
+
+    return (
+        startPosition +
+        logicalPosition
+    ) % 52;
+
+}
+
+    </script>
+
+<script>
+
+const backgroundMusic =
+    document.getElementById("backgroundMusic");
+
+const musicToggle =
+    document.getElementById("musicToggle");
+
+let musicEnabled = false;
+
+
+function toggleMusic() {
+
+    if (!backgroundMusic || !musicToggle) {
+        return;
+    }
+
+
+    if (musicEnabled) {
+
+        // TURN MUSIC OFF
+        backgroundMusic.pause();
+
+        musicEnabled = false;
+
+        musicToggle.textContent = "🔇";
+
+    }
+
+    else {
+
+        // TURN MUSIC ON
+        backgroundMusic.currentTime = 0;
+
+        backgroundMusic.play()
+            .then(() => {
+
+                musicEnabled = true;
+
+                musicToggle.textContent = "🔊";
+
+            })
+            .catch((error) => {
+
+                console.error(
+                    "Music playback error:",
+                    error
+                );
+
+                musicEnabled = false;
+
+                musicToggle.textContent = "🔇";
+
+            });
+
+    }
+
+}
+
+function playDiceSound() {
+
+    const diceSound =
+        document.getElementById("diceSound");
+
+    diceSound.currentTime = 0;
+
+    diceSound.play().catch(() => {});
+
+}
+
+</script>
+</body>
+
+</html>

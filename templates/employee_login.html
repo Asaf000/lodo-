@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        LP Employee Login
+    </title>
+
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            min-height: 100vh;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 20px;
+
+            background: #f5f8fc;
+
+            color: #172033;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+        }
+
+
+        .login-container {
+
+            width: 100%;
+
+            max-width: 420px;
+
+            padding: 35px;
+
+            background: #ffffff;
+
+            border:
+                1px solid #e1e8f0;
+
+            border-radius: 16px;
+
+            box-shadow:
+                0 10px 35px
+                rgba(23, 60, 100, 0.08);
+        }
+
+
+        .logo {
+
+            text-align: center;
+
+            color: #1769e0;
+
+            font-size: 30px;
+
+            font-weight: 800;
+
+            letter-spacing: 1px;
+
+            margin-bottom: 8px;
+        }
+
+
+        .title {
+
+            text-align: center;
+
+            color: #172033;
+
+            font-size: 22px;
+
+            font-weight: 750;
+
+            margin-bottom: 7px;
+        }
+
+
+        .subtitle {
+
+            text-align: center;
+
+            color: #7a8797;
+
+            font-size: 13px;
+
+            margin-bottom: 28px;
+        }
+
+
+        .flash-message {
+
+            padding:
+                12px 14px;
+
+            margin-bottom:
+                18px;
+
+            border-radius:
+                8px;
+
+            background:
+                #edf5ff;
+
+            border:
+                1px solid #cfe2ff;
+
+            color:
+                #1455a0;
+
+            font-size:
+                13px;
+
+            font-weight:
+                600;
+        }
+
+
+        .form-group {
+
+            margin-bottom:
+                18px;
+        }
+
+
+        .form-group label {
+
+            display: block;
+
+            margin-bottom:
+                7px;
+
+            color:
+                #4a5568;
+
+            font-size:
+                13px;
+
+            font-weight:
+                700;
+        }
+
+
+        .form-group input {
+
+            width: 100%;
+
+            height: 46px;
+
+            padding:
+                0 13px;
+
+            border:
+                1px solid #d7e0eb;
+
+            border-radius:
+                8px;
+
+            background:
+                #ffffff;
+
+            color:
+                #172033;
+
+            font-family:
+                inherit;
+
+            font-size:
+                14px;
+
+            outline:
+                none;
+        }
+
+
+        .form-group input:focus {
+
+            border-color:
+                #1769e0;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(23, 105, 224, 0.10);
+        }
+
+
+        .login-btn {
+
+            width: 100%;
+
+            height: 46px;
+
+            margin-top:
+                5px;
+
+            border:
+                none;
+
+            border-radius:
+                8px;
+
+            background:
+                #1769e0;
+
+            color:
+                #ffffff;
+
+            font-family:
+                inherit;
+
+            font-size:
+                14px;
+
+            font-weight:
+                700;
+
+            cursor:
+                pointer;
+        }
+
+
+        .login-btn:hover {
+
+            background:
+                #0d55bd;
+        }
+
+
+        @media (
+            max-width: 480px
+        ) {
+
+            .login-container {
+
+                padding:
+                    26px 20px;
+
+                border-radius:
+                    13px;
+            }
+
+
+            .logo {
+
+                font-size:
+                    27px;
+            }
+
+
+            .title {
+
+                font-size:
+                    20px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <div class="login-container">
+
+
+        <div class="logo">
+            LP
+        </div>
+
+
+        <h1 class="title">
+            Employee Login
+        </h1>
+
+
+        <p class="subtitle">
+            Sign in to access your employee dashboard
+        </p>
+
+
+        <!-- =====================================
+             FLASH
+        ===================================== -->
+
+        {% with messages =
+            get_flashed_messages(
+                with_categories=true
+            )
+        %}
+
+
+            {% for category, message in messages %}
+
+                <div class="flash-message">
+
+                    {{ message }}
+
+                </div>
+
+            {% endfor %}
+
+
+        {% endwith %}
+
+
+        <!-- =====================================
+             LOGIN FORM
+        ===================================== -->
+
+        <form
+            method="POST"
+            action="{{
+                url_for(
+                    'employee.employee_login'
+                )
+            }}"
+        >
+
+
+            <div class="form-group">
+
+                <label
+                    for="username"
+                >
+                    Employee Username
+                </label>
+
+
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="Enter employee username"
+                    required
+                    autocomplete="username"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label
+                    for="password"
+                >
+                    Password
+                </label>
+
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter password"
+                    required
+                    autocomplete="current-password"
+                >
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="login-btn"
+            >
+                Login
+            </button>
+
+
+        </form>
+
+
+    </div>
+
+
+</body>
+
+</html>

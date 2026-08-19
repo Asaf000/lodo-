@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>LP Employee - Withdrawal</title>
+
+
+    <style>
+
+        /* =====================================
+           GLOBAL
+        ===================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            min-height: 100vh;
+
+            background: #f5f8fc;
+
+            color: #172033;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+        }
+
+
+        /* =====================================
+           NAVBAR
+        ===================================== */
+
+        .top-navbar {
+
+            width: 100%;
+
+            height: 70px;
+
+            background: #ffffff;
+
+            border-bottom:
+                1px solid #e3e9f1;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 0 35px;
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 1000;
+        }
+
+
+        .logo {
+
+            color: #1769e0;
+
+            font-size: 27px;
+
+            font-weight: 800;
+
+            letter-spacing: 1px;
+        }
+
+
+        .nav-right {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+        }
+
+
+        .nav-btn {
+
+            height: 40px;
+
+            padding: 0 17px;
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 8px;
+
+            text-decoration: none;
+
+            font-size: 14px;
+
+            font-weight: 700;
+        }
+
+
+        .home-btn {
+
+            background: #edf4ff;
+
+            color: #1769e0;
+
+            border: 1px solid #cfe0fb;
+        }
+
+
+        .logout-btn {
+
+            background: #1769e0;
+
+            color: #ffffff;
+
+            border: 1px solid #1769e0;
+        }
+
+
+        .home-btn:hover {
+
+            background: #dfeeff;
+        }
+
+
+        .logout-btn:hover {
+
+            background: #0d55bd;
+        }
+
+
+        /* =====================================
+           MAIN CONTAINER
+        ===================================== */
+
+        .main-container {
+
+            width: calc(100% - 60px);
+
+            max-width: 1200px;
+
+            margin: 35px auto 50px;
+        }
+
+
+        /* =====================================
+           FLASH MESSAGE
+        ===================================== */
+
+        .flash-message {
+
+            padding: 13px 16px;
+
+            margin-bottom: 20px;
+
+            border-radius: 8px;
+
+            background: #edf5ff;
+
+            border: 1px solid #cfe2ff;
+
+            color: #1455a0;
+
+            font-size: 14px;
+
+            font-weight: 600;
+        }
+
+
+        /* =====================================
+           SECTION CONTAINER
+        ===================================== */
+
+        .section-container {
+
+            width: 100%;
+
+            background: #ffffff;
+
+            border: 1px solid #e1e8f0;
+
+            border-radius: 16px;
+
+            padding: 28px;
+
+            box-shadow:
+                0 6px 24px
+                rgba(23, 60, 100, 0.06);
+
+            margin-bottom: 28px;
+        }
+
+
+        .section-title {
+
+            margin-bottom: 22px;
+
+            font-size: 21px;
+
+            font-weight: 750;
+        }
+
+
+        /* =====================================
+           PENDING WITHDRAWAL LIST
+        ===================================== */
+
+        .withdrawal-list {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 15px;
+        }
+
+
+        .withdrawal-item {
+
+            padding: 20px;
+
+            background: #fbfdff;
+
+            border: 1px solid #e0e7ef;
+
+            border-radius: 11px;
+        }
+
+
+        /* =====================================
+           WITHDRAWAL DETAILS
+        ===================================== */
+
+        .withdrawal-details {
+
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap: 20px;
+
+            margin-bottom: 20px;
+        }
+
+
+        .detail-label {
+
+            display: block;
+
+            margin-bottom: 7px;
+
+            color: #7a8797;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+        }
+
+
+        .detail-value {
+
+            color: #172033;
+
+            font-size: 15px;
+
+            font-weight: 600;
+        }
+
+
+        .amount-value {
+
+            color: #1769e0;
+
+            font-size: 17px;
+
+            font-weight: 800;
+        }
+
+
+        /* =====================================
+           UTR FORM
+        ===================================== */
+
+        .utr-form {
+
+            display: flex;
+
+            align-items: flex-end;
+
+            gap: 12px;
+
+            padding-top: 18px;
+
+            border-top:
+                1px solid #e8edf3;
+        }
+
+
+        .utr-group {
+
+            flex: 1;
+
+            display: flex;
+
+            flex-direction: column;
+        }
+
+
+        .utr-group label {
+
+            margin-bottom: 7px;
+
+            color: #4a5568;
+
+            font-size: 12px;
+
+            font-weight: 700;
+        }
+
+
+        .utr-group input {
+
+            width: 100%;
+
+            height: 43px;
+
+            padding: 0 12px;
+
+            border:
+                1px solid #d7e0eb;
+
+            border-radius: 7px;
+
+            outline: none;
+
+            font-family: inherit;
+
+            font-size: 13px;
+
+            background: #ffffff;
+        }
+
+
+        .utr-group input:focus {
+
+            border-color: #1769e0;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(23, 105, 224, 0.10);
+        }
+
+
+        /* =====================================
+           SUBMIT BUTTON
+        ===================================== */
+
+        .submit-btn {
+
+            height: 43px;
+
+            min-width: 110px;
+
+            padding: 0 20px;
+
+            border:
+                1px solid #1769e0;
+
+            border-radius: 7px;
+
+            background: #1769e0;
+
+            color: #ffffff;
+
+            font-family: inherit;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            transition:
+                background 0.2s ease,
+                transform 0.2s ease;
+        }
+
+
+        .submit-btn:hover {
+
+            background: #0d55bd;
+
+            transform: translateY(-1px);
+        }
+
+
+        /* =====================================
+           EMPTY STATE
+        ===================================== */
+
+        .empty-state {
+
+            padding: 30px 20px;
+
+            text-align: center;
+
+            color: #7a8797;
+
+            font-size: 14px;
+
+            border:
+                1px dashed #d5deea;
+
+            border-radius: 10px;
+        }
+
+
+        /* =====================================
+           TABLE
+        ===================================== */
+
+        .table-wrapper {
+
+            width: 100%;
+
+            overflow-x: auto;
+
+            border:
+                1px solid #e1e8f0;
+
+            border-radius: 10px;
+        }
+
+
+        .history-table {
+
+            width: 100%;
+
+            min-width: 650px;
+
+            border-collapse: collapse;
+        }
+
+
+        .history-table th {
+
+            padding: 14px 15px;
+
+            text-align: left;
+
+            background: #f5f8fc;
+
+            color: #5c6979;
+
+            font-size: 12px;
+
+            font-weight: 800;
+
+            text-transform: uppercase;
+
+            border-bottom:
+                1px solid #e1e8f0;
+
+            white-space: nowrap;
+        }
+
+
+        .history-table td {
+
+            padding: 14px 15px;
+
+            color: #273448;
+
+            font-size: 13px;
+
+            border-bottom:
+                1px solid #edf1f5;
+
+            white-space: nowrap;
+        }
+
+
+        .history-table tr:last-child td {
+
+            border-bottom: none;
+        }
+
+
+        .admin-label {
+
+            color: #1769e0;
+
+            font-weight: 800;
+        }
+
+
+        .employee-label {
+
+            color: #1769e0;
+
+            font-weight: 800;
+        }
+
+
+        /* =====================================
+           STATUS
+        ===================================== */
+
+        .status-approved {
+
+            color: #1769e0;
+
+            font-weight: 700;
+        }
+
+
+        .status-rejected {
+
+            color: #c0392b;
+
+            font-weight: 700;
+        }
+
+
+        /* =====================================
+           PAGINATION
+        ===================================== */
+
+        .pagination {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: flex-end;
+
+            gap: 10px;
+
+            margin-top: 20px;
+
+            flex-wrap: wrap;
+        }
+
+
+        .page-info {
+
+            color: #6d7988;
+
+            font-size: 13px;
+        }
+
+
+        .pagination-btn {
+
+            min-width: 82px;
+
+            height: 38px;
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 0 15px;
+
+            border-radius: 7px;
+
+            background: #1769e0;
+
+            color: #ffffff;
+
+            text-decoration: none;
+
+            font-size: 13px;
+
+            font-weight: 700;
+        }
+
+
+        .pagination-btn:hover {
+
+            background: #0d55bd;
+        }
+
+
+        /* =====================================
+           MOBILE
+        ===================================== */
+
+        @media (max-width: 600px) {
+
+            .top-navbar {
+
+                height: 64px;
+
+                padding: 0 16px;
+            }
+
+
+            .logo {
+
+                font-size: 24px;
+            }
+
+
+            .nav-btn {
+
+                height: 37px;
+
+                padding: 0 11px;
+
+                font-size: 12px;
+            }
+
+
+            .main-container {
+
+                width:
+                    calc(100% - 22px);
+
+                margin:
+                    20px auto 30px;
+            }
+
+
+            .section-container {
+
+                padding: 18px;
+
+                border-radius: 13px;
+            }
+
+
+            .section-title {
+
+                font-size: 19px;
+            }
+
+
+            .withdrawal-details {
+
+                grid-template-columns: 1fr;
+
+                gap: 14px;
+            }
+
+
+            .utr-form {
+
+                flex-direction: column;
+
+                align-items: stretch;
+            }
+
+
+            .submit-btn {
+
+                width: 100%;
+            }
+
+
+            .pagination {
+
+                justify-content: space-between;
+            }
+
+
+            .page-info {
+
+                width: 100%;
+            }
+
+
+            .pagination-btn {
+
+                flex: 1;
+            }
+
+        }
+
+
+        @media (max-width: 380px) {
+
+            .top-navbar {
+
+                padding: 0 12px;
+            }
+
+
+            .nav-right {
+
+                gap: 6px;
+            }
+
+
+            .nav-btn {
+
+                padding: 0 9px;
+            }
+
+        }
+
+.user-bank-details {
+    margin-top: 20px;
+}
+
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================
+         TOP NAVBAR
+    ===================================== -->
+
+    <nav class="top-navbar">
+
+
+        <div class="logo">
+
+            LP
+
+        </div>
+
+
+        <div class="nav-right">
+
+
+            <a
+                href="{{ url_for('employee.employee_dashboard') }}"
+                class="nav-btn home-btn"
+            >
+                Home
+            </a>
+
+
+            <a
+                href="{{ url_for('employee.employee_logout') }}"
+                class="nav-btn logout-btn"
+            >
+                Logout
+            </a>
+
+
+        </div>
+
+
+    </nav>
+
+
+    <!-- =====================================
+         MAIN
+    ===================================== -->
+
+    <main class="main-container">
+
+
+        <!-- =====================================
+             FLASH MESSAGES
+        ===================================== -->
+
+        {% with messages =
+            get_flashed_messages(
+                with_categories=true
+            )
+        %}
+
+            {% for category, message in messages %}
+
+                <div class="flash-message">
+
+                    {{ message }}
+
+                </div>
+
+            {% endfor %}
+
+        {% endwith %}
+
+
+        <!-- =====================================
+             PENDING WITHDRAWALS
+        ===================================== -->
+
+        <section class="section-container">
+
+
+            <h2 class="section-title">
+
+                Withdrawal Requests
+
+            </h2>
+
+
+            {% if pending_withdrawals %}
+
+
+                <div class="withdrawal-list">
+
+
+                    {% for withdrawal in pending_withdrawals %}
+
+
+                        <div class="withdrawal-item">
+
+
+                            <div class="withdrawal-details">
+
+
+                                <!-- AMOUNT -->
+
+                                <div>
+
+                                    <span class="detail-label">
+                                        Amount
+                                    </span>
+
+                                    <span
+                                        class="detail-value amount-value"
+                                    >
+                                        ₹{{ "%.2f"|format(
+                                            withdrawal.amount|float
+                                        ) }}
+                                    </span>
+
+                                </div>
+
+
+                                <!-- DATE -->
+
+                                <div>
+
+                                    <span class="detail-label">
+                                        Date
+                                    </span>
+
+                                    <span class="detail-value">
+                                        {{ withdrawal.timestamp }}
+                                    </span>
+
+                                </div>
+
+
+                            </div>
+
+
+<!-- =================================
+     USER BANK / PAYMENT DETAILS
+================================= -->
+
+<div class="withdrawal-details user-bank-details">
+
+    <!-- BANK NAME -->
+
+    <div class="detail-box">
+
+        <span class="detail-label">
+            Bank Name
+        </span>
+
+        <span class="detail-value">
+            {{ withdrawal.bankname or '...' }}
+        </span>
+
+    </div>
+
+
+    <!-- ACCOUNT NUMBER -->
+
+    <div class="detail-box">
+
+        <span class="detail-label">
+            Account Number
+        </span>
+
+        <span class="detail-value">
+            {{ withdrawal.bankaccountnumber or '...' }}
+        </span>
+
+    </div>
+
+
+    <!-- IFSC -->
+
+    <div class="detail-box">
+
+        <span class="detail-label">
+            IFSC Code
+        </span>
+
+        <span class="detail-value">
+            {{ withdrawal.ifsccode or '...' }}
+        </span>
+
+    </div>
+
+
+    <!-- UPI -->
+
+    <div class="detail-box">
+
+        <span class="detail-label">
+            UPI ID
+        </span>
+
+        <span class="detail-value">
+            {{ withdrawal.upiid or '...' }}
+        </span>
+
+    </div>
+
+</div>
+
+
+                            <!-- =================================
+                                 UTR + SUBMIT
+                            ================================= -->
+
+                            <form
+                                method="POST"
+                                action="{{
+                                    url_for(
+                                        'employee.employee_process_withdrawal',
+                                        withdrawalid=withdrawal.withdrawalid
+                                    )
+                                }}"
+                                class="utr-form"
+                            >
+
+
+                                <div class="utr-group">
+
+
+                                    <label for="utr-{{ withdrawal.withdrawalid }}">
+
+                                        UTR
+
+                                    </label>
+
+
+                                    <input
+                                        id="utr-{{ withdrawal.withdrawalid }}"
+                                        type="text"
+                                        name="utr"
+                                        placeholder="Enter UTR"
+                                        required
+                                        autocomplete="off"
+                                    >
+
+
+                                </div>
+
+
+                                <button
+                                    type="submit"
+                                    class="submit-btn"
+                                >
+
+                                    Submit
+
+                                </button>
+
+
+                            </form>
+
+
+                        </div>
+
+
+                    {% endfor %}
+
+
+                </div>
+
+
+            {% else %}
+
+
+                <div class="empty-state">
+
+                    No pending withdrawal requests.
+
+                </div>
+
+
+            {% endif %}
+
+
+            <!-- =====================================
+                 PENDING PAGINATION
+            ===================================== -->
+
+            {% if total_pending_pages > 1 %}
+
+
+                <div class="pagination">
+
+
+                    <span class="page-info">
+
+                        Page
+                        {{ pending_page }}
+                        of
+                        {{ total_pending_pages }}
+
+                    </span>
+
+
+                    {% if pending_page > 1 %}
+
+                        <a
+                            href="{{
+                                url_for(
+                                    'employee.employee_withdrawal',
+                                    pending_page=pending_page - 1,
+                                    history_page=history_page
+                                )
+                            }}"
+                            class="pagination-btn"
+                        >
+
+                            Previous
+
+                        </a>
+
+                    {% endif %}
+
+
+                    {% if pending_page < total_pending_pages %}
+
+                        <a
+                            href="{{
+                                url_for(
+                                    'employee.employee_withdrawal',
+                                    pending_page=pending_page + 1,
+                                    history_page=history_page
+                                )
+                            }}"
+                            class="pagination-btn"
+                        >
+
+                            Next
+
+                        </a>
+
+                    {% endif %}
+
+
+                </div>
+
+
+            {% endif %}
+
+
+        </section>
+
+
+        <!-- =====================================
+             WITHDRAWAL HISTORY
+        ===================================== -->
+
+        <section class="section-container">
+
+
+            <h2 class="section-title">
+
+                Withdrawal History
+
+            </h2>
+
+
+            <div class="table-wrapper">
+
+
+                <table class="history-table">
+
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Amount
+                            </th>
+
+                            <th>
+                                Date
+                            </th>
+
+                            <th>
+                                UTR
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Approved By
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+
+                        {% if withdrawal_history %}
+
+
+                            {% for item in withdrawal_history %}
+
+
+                                <tr>
+
+
+                                    <td>
+
+                                        ₹{{ "%.2f"|format(
+                                            item.amount|float
+                                        ) }}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {{ item.timestamp }}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {{ item.utr or "-" }}
+
+                                    </td>
+
+
+                                    <td>
+
+
+                                        {% if item.status == "Approved" %}
+
+                                            <span
+                                                class="status-approved"
+                                            >
+                                                Approved
+                                            </span>
+
+                                        {% elif item.status == "Rejected" %}
+
+                                            <span
+                                                class="status-rejected"
+                                            >
+                                                Rejected
+                                            </span>
+
+                                        {% else %}
+
+                                            {{ item.status }}
+
+                                        {% endif %}
+
+
+                                    </td>
+
+
+                                    <td>
+
+
+                                        {% if
+                                            item.primaryapprovedby == 1
+                                            and
+                                            item.secondaryapprovedby == 1
+                                        %}
+
+                                            <span
+                                                class="employee-label"
+                                            >
+
+                                                Employee
+
+                                            </span>
+
+
+                                        {% elif
+                                            item.primaryapprovedby == 1
+                                        %}
+
+                                            <span
+                                                class="admin-label"
+                                            >
+
+                                                Admin
+
+                                            </span>
+
+
+                                        {% else %}
+
+                                            -
+
+                                        {% endif %}
+
+
+                                    </td>
+
+
+                                </tr>
+
+
+                            {% endfor %}
+
+
+                        {% else %}
+
+
+                            <tr>
+
+                                <td
+                                    colspan="5"
+                                    style="
+                                        text-align: center;
+                                        padding: 25px;
+                                    "
+                                >
+
+                                    No processed withdrawals yet.
+
+                                </td>
+
+                            </tr>
+
+
+                        {% endif %}
+
+
+                    </tbody>
+
+
+                </table>
+
+
+            </div>
+
+
+            <!-- =====================================
+                 HISTORY PAGINATION
+            ===================================== -->
+
+            {% if total_history_pages > 1 %}
+
+
+                <div class="pagination">
+
+
+                    <span class="page-info">
+
+                        Page
+                        {{ history_page }}
+                        of
+                        {{ total_history_pages }}
+
+                    </span>
+
+
+                    {% if history_page > 1 %}
+
+                        <a
+                            href="{{
+                                url_for(
+                                    'employee.employee_withdrawal',
+                                    pending_page=pending_page,
+                                    history_page=history_page - 1
+                                )
+                            }}"
+                            class="pagination-btn"
+                        >
+
+                            Previous
+
+                        </a>
+
+                    {% endif %}
+
+
+                    {% if history_page < total_history_pages %}
+
+                        <a
+                            href="{{
+                                url_for(
+                                    'employee.employee_withdrawal',
+                                    pending_page=pending_page,
+                                    history_page=history_page + 1
+                                )
+                            }}"
+                            class="pagination-btn"
+                        >
+
+                            Next
+
+                        </a>
+
+                    {% endif %}
+
+
+                </div>
+
+
+            {% endif %}
+
+
+        </section>
+
+
+    </main>
+
+
+</body>
+
+</html>

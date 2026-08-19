@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>LodoPlayers</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/dashboard.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+<div class="dashboard-container">
+
+
+    <!-- =================================
+         LODO CLASSIC
+    ================================= -->
+
+    <div class="game-card">
+
+        <button
+            class="game-btn"
+            onclick="window.location.href='{{ url_for('classic_dashboard') }}'"
+        >
+
+            <img
+                src="{{ url_for('static', filename='images/lodo-classic.png') }}"
+                alt="Lodo Classic"
+                class="game-image"
+            >
+
+            <span class="game-title">
+                Lodo Classic
+            </span>
+
+        </button>
+
+    </div>
+
+
+
+    <!-- =================================
+         LODO KING
+    ================================= -->
+
+    <div class="game-card">
+
+        <button
+            class="game-btn"
+            onclick="openPopup()"
+        >
+
+            <img
+                src="{{ url_for('static', filename='images/lodo-king.png') }}"
+                alt="Lodo King"
+                class="game-image"
+            >
+
+            <span class="game-title">
+                Lodo King
+            </span>
+
+        </button>
+
+    </div>
+    <!-- =================================
+     SUPPORT
+================================= -->
+
+<div class="support-card">
+
+    <h2>
+        Support
+    </h2>
+
+    <div class="support-details">
+
+        <span class="support-label">
+            Contact Number:
+        </span>
+
+        <span class="support-number">
+            WhatsApp only, no call
+        </span>
+
+    </div>
+
+</div>
+
+</div>
+
+
+
+<!-- =================================
+     POPUP
+================================= -->
+
+<div
+    class="popup-overlay"
+    id="popup"
+>
+
+    <div class="popup-box">
+
+        <button
+            class="close-btn"
+            onclick="closePopup()"
+        >
+            &times;
+        </button>
+
+        <h2>
+            Under Progress
+        </h2>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+function openPopup(){
+
+    document.getElementById("popup").style.display = "flex";
+
+}
+
+
+function closePopup(){
+
+    document.getElementById("popup").style.display = "none";
+
+}
+
+</script>
+
+
+</body>
+
+</html>

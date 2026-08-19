@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Withdrawals</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/withdrawal.css') }}">
+</head>
+
+<body>
+
+    <!-- Top Navigation -->
+
+    <nav class="top-navbar">
+
+        <div class="logo-section">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+        </div>
+
+        <button class="menu-btn" onclick="toggleMenu()">
+            &#9776;
+        </button>
+
+    </nav>
+
+    <!-- Mobile Menu -->
+
+    <div class="mobile-menu" id="mobileMenu">
+
+        <a href="{{ url_for('classic_dashboard') }}">Dashboard</a>
+
+        <a href="{{ url_for('balance') }}">Balance</a>
+
+        <a href="{{ url_for('matches') }}">
+            Matches
+        </a>
+
+        <a href="{{ url_for('profile') }}">Profile</a>
+
+        
+
+        <a href="{{ url_for('logout') }}">Logout</a>
+
+    </div>
+
+    <!-- Main Section -->
+
+    <main class="main-section">
+
+    <div class="withdrawal-card">
+
+        <h2>You can do your withdrawal from here.</h2>
+
+    </div>
+
+<div class="withdraw-card">
+
+    <h2>Withdraw</h2>
+
+    <form method="POST" action="{{ url_for('withdrawal') }}">
+
+        <input
+            type="number"
+            name="amount"
+            class="withdraw-input"
+            placeholder="Enter Withdrawal Amount"
+            required>
+
+        <div class="payment-method">
+
+            <p>Select Payment Method</p>
+
+            <label>
+                <input
+                    type="radio"
+                    name="paymentmethod"
+                    value="bank"
+                    required>
+
+                Bank Account
+            </label>
+
+            <label>
+                <input
+                    type="radio"
+                    name="paymentmethod"
+                    value="upi">
+
+                UPI ID
+            </label>
+
+        </div>
+
+        <button
+            type="submit"
+            class="withdraw-btn">
+
+            Submit Withdrawal
+
+        </button>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+
+                    <p class="{% if category == 'success' %}success-message{% else %}error-message{% endif %}">
+                        {{ message }}
+                    </p>
+
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+    </form>
+
+</div>
+
+<div class="withdraw-history-card">
+
+    <h2>Your Withdrawals</h2>
+
+    {% if withdrawals %}
+
+        {% for row in withdrawals %}
+
+        <div class="withdraw-history-item">
+
+            <div class="withdraw-history-row">
+
+                <span><strong>Amount</strong></span>
+
+                <span class="withdraw-status">{{ row.status }}</span>
+
+            </div>
+
+            <div class="withdraw-history-row">
+
+                <span>₹{{ row.amount }}</span>
+
+            </div>
+
+            <div class="withdraw-history-row">
+
+                <span><strong>UTR</strong></span>
+
+            </div>
+
+            <div class="withdraw-history-row">
+
+                <span>
+                    {{ row.utr if row.utr else "Pending" }}
+                </span>
+
+            </div>
+
+            <div class="withdraw-history-row">
+
+                <span>
+
+                    <strong>Approved By :</strong>
+
+                    {% if row.primaryapprovedby %}
+                        Admin
+                    {% else %}
+                        Pending
+                    {% endif %}
+
+                </span>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>No withdrawal history available.</p>
+
+    {% endif %}
+
+</div>
+
+</main>
+
+    <script>
+
+        function toggleMenu(){
+
+            document.getElementById("mobileMenu").classList.toggle("active");
+
+        }
+
+    </script>
+<script>
+
+setTimeout(function(){
+
+    const flashMessages = document.querySelectorAll(
+        ".success-message, .error-message"
+    );
+
+    flashMessages.forEach(function(message){
+
+        message.style.transition = "opacity 0.5s ease";
+
+        message.style.opacity = "0";
+
+        setTimeout(function(){
+
+            message.style.display = "none";
+
+        },500);
+
+    });
+
+},5000);
+
+</script>
+</body>
+</html>

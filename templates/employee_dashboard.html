@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        LP Employee Dashboard
+    </title>
+
+
+    <style>
+
+        /* =====================================
+           GLOBAL
+        ===================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        html {
+            width: 100%;
+            min-height: 100%;
+        }
+
+
+        body {
+
+            width: 100%;
+
+            min-height: 100vh;
+
+            background: #f5f8fc;
+
+            color: #172033;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            -webkit-font-smoothing:
+                antialiased;
+        }
+
+
+        /* =====================================
+           TOP NAVBAR
+        ===================================== */
+
+        .top-navbar {
+
+            width: 100%;
+
+            height: 70px;
+
+            background: #ffffff;
+
+            border-bottom:
+                1px solid #e3e9f1;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding:
+                0 35px;
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 1000;
+        }
+
+
+        /* =====================================
+           LP LOGO
+        ===================================== */
+
+        .logo {
+
+            color: #1769e0;
+
+            font-size: 27px;
+
+            font-weight: 800;
+
+            letter-spacing: 1px;
+
+            line-height: 1;
+        }
+
+
+        /* =====================================
+           LOGOUT
+        ===================================== */
+
+        .logout-btn {
+
+            height: 40px;
+
+            padding:
+                0 18px;
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 8px;
+
+            background: #1769e0;
+
+            border:
+                1px solid #1769e0;
+
+            color: #ffffff;
+
+            text-decoration: none;
+
+            font-size: 14px;
+
+            font-weight: 700;
+
+            transition:
+                background 0.2s ease,
+                transform 0.2s ease;
+        }
+
+
+        .logout-btn:hover {
+
+            background: #0d55bd;
+
+            transform:
+                translateY(-1px);
+        }
+
+
+        /* =====================================
+           MAIN CONTAINER
+        ===================================== */
+
+        .main-container {
+
+            width:
+                calc(100% - 40px);
+
+            max-width:
+                900px;
+
+            margin:
+                40px auto 50px;
+        }
+
+
+        /* =====================================
+           HELLO CONTAINER
+        ===================================== */
+
+        .welcome-container {
+
+            width: 100%;
+
+            min-height: 180px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background: #ffffff;
+
+            border:
+                1px solid #e1e8f0;
+
+            border-radius: 16px;
+
+            box-shadow:
+                0 6px 24px
+                rgba(23, 60, 100, 0.06);
+
+            margin-bottom: 25px;
+
+            text-align: center;
+        }
+
+
+        .welcome-title {
+
+            color: #172033;
+
+            font-size: 30px;
+
+            font-weight: 750;
+        }
+
+
+        /* =====================================
+           ACTION CONTAINER
+        ===================================== */
+
+        .action-container {
+
+            width: 100%;
+
+            background: #ffffff;
+
+            border:
+                1px solid #e1e8f0;
+
+            border-radius: 16px;
+
+            padding: 35px;
+
+            box-shadow:
+                0 6px 24px
+                rgba(23, 60, 100, 0.06);
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            gap: 18px;
+        }
+
+
+        /* =====================================
+           ACTION BUTTON
+        ===================================== */
+
+        .action-btn {
+
+            min-width: 180px;
+
+            height: 52px;
+
+            padding:
+                0 25px;
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 9px;
+
+            background: #1769e0;
+
+            color: #ffffff;
+
+            text-decoration: none;
+
+            font-size: 15px;
+
+            font-weight: 700;
+
+            transition:
+                background 0.2s ease,
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+
+        .action-btn:hover {
+
+            background: #0d55bd;
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 6px 15px
+                rgba(23, 105, 224, 0.18);
+        }
+
+
+        /* =====================================
+           MOBILE
+        ===================================== */
+
+        @media (
+            max-width: 600px
+        ) {
+
+            .top-navbar {
+
+                height: 64px;
+
+                padding:
+                    0 16px;
+            }
+
+
+            .logo {
+
+                font-size: 24px;
+            }
+
+
+            .logout-btn {
+
+                height: 37px;
+
+                padding:
+                    0 13px;
+
+                font-size: 12px;
+            }
+
+
+            .main-container {
+
+                width:
+                    calc(100% - 22px);
+
+                margin:
+                    25px auto 35px;
+            }
+
+
+            .welcome-container {
+
+                min-height: 150px;
+
+                border-radius:
+                    13px;
+
+                margin-bottom:
+                    18px;
+            }
+
+
+            .welcome-title {
+
+                font-size: 25px;
+            }
+
+
+            .action-container {
+
+                padding:
+                    22px 18px;
+
+                flex-direction:
+                    column;
+
+                gap:
+                    12px;
+
+                border-radius:
+                    13px;
+            }
+
+
+            .action-btn {
+
+                width: 100%;
+
+                min-width: 0;
+
+                height: 50px;
+            }
+
+        }
+
+
+        @media (
+            max-width: 380px
+        ) {
+
+            .top-navbar {
+
+                padding:
+                    0 12px;
+            }
+
+
+            .main-container {
+
+                width:
+                    calc(100% - 16px);
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================
+         TOP NAVBAR
+    ===================================== -->
+
+    <nav class="top-navbar">
+
+
+        <div class="logo">
+
+            LP
+
+        </div>
+
+
+        <a
+            href="{{ url_for('employee.employee_logout') }}"
+            class="logout-btn"
+        >
+            Logout
+        </a>
+
+
+    </nav>
+
+
+    <!-- =====================================
+         MAIN
+    ===================================== -->
+
+    <main class="main-container">
+
+
+        <!-- =====================================
+             WELCOME
+        ===================================== -->
+
+        <section class="welcome-container">
+
+            <h1 class="welcome-title">
+
+                Hello Employee
+
+            </h1>
+
+        </section>
+
+
+        <!-- =====================================
+             ACTIONS
+        ===================================== -->
+
+        <section class="action-container">
+
+
+            <a
+                href="{{ url_for('employee.employee_balance') }}"
+                class="action-btn"
+            >
+                Balance
+            </a>
+
+
+            <a
+                href="{{ url_for('employee.employee_withdrawal') }}"
+                class="action-btn"
+            >
+                Withdrawal
+            </a>
+
+
+        </section>
+
+
+    </main>
+
+
+</body>
+
+</html>

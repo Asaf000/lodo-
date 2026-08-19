@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        LP Employee - Balance
+    </title>
+
+
+    <style>
+
+        /* =====================================
+           GLOBAL
+        ===================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            min-height: 100vh;
+
+            background: #f5f8fc;
+
+            color: #172033;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+        }
+
+
+        /* =====================================
+           NAVBAR
+        ===================================== */
+
+        .top-navbar {
+
+            width: 100%;
+
+            height: 70px;
+
+            background: #ffffff;
+
+            border-bottom:
+                1px solid #e3e9f1;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding:
+                0 35px;
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 1000;
+        }
+
+
+        .logo {
+
+            color: #1769e0;
+
+            font-size: 27px;
+
+            font-weight: 800;
+
+            letter-spacing: 1px;
+        }
+
+
+        .nav-right {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+        }
+
+
+        .nav-btn {
+
+            height: 40px;
+
+            padding:
+                0 17px;
+
+            border-radius: 8px;
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            text-decoration: none;
+
+            font-size: 14px;
+
+            font-weight: 700;
+        }
+
+
+        .home-btn {
+
+            background: #edf4ff;
+
+            color: #1769e0;
+
+            border:
+                1px solid #cfe0fb;
+        }
+
+
+        .logout-btn {
+
+            background: #1769e0;
+
+            color: #ffffff;
+
+            border:
+                1px solid #1769e0;
+        }
+
+
+        .home-btn:hover {
+
+            background: #dfeeff;
+        }
+
+
+        .logout-btn:hover {
+
+            background: #0d55bd;
+        }
+
+
+        /* =====================================
+           MAIN
+        ===================================== */
+
+        .main-container {
+
+            width:
+                calc(100% - 60px);
+
+            max-width:
+                1200px;
+
+            margin:
+                35px auto 50px;
+        }
+
+
+        /* =====================================
+           FLASH
+        ===================================== */
+
+        .flash-message {
+
+            padding:
+                13px 16px;
+
+            margin-bottom:
+                20px;
+
+            border-radius:
+                8px;
+
+            background:
+                #edf5ff;
+
+            border:
+                1px solid #cfe2ff;
+
+            color:
+                #1455a0;
+
+            font-size:
+                14px;
+
+            font-weight:
+                600;
+        }
+
+
+        /* =====================================
+           SECTION
+        ===================================== */
+
+        .section-container {
+
+            width: 100%;
+
+            background: #ffffff;
+
+            border:
+                1px solid #e1e8f0;
+
+            border-radius:
+                16px;
+
+            padding:
+                28px;
+
+            box-shadow:
+                0 6px 24px
+                rgba(23, 60, 100, 0.06);
+
+            margin-bottom:
+                28px;
+        }
+
+
+        .section-title {
+
+            margin-bottom:
+                22px;
+
+            font-size:
+                21px;
+
+            font-weight:
+                750;
+        }
+
+
+        /* =====================================
+           PENDING REQUEST
+        ===================================== */
+
+        .pending-list {
+
+            display:
+                flex;
+
+            flex-direction:
+                column;
+
+            gap:
+                15px;
+        }
+
+
+        .pending-item {
+
+            padding:
+                18px;
+
+            background:
+                #fbfdff;
+
+            border:
+                1px solid #e0e7ef;
+
+            border-radius:
+                11px;
+        }
+
+
+        .pending-details {
+
+            display:
+                grid;
+
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+
+            gap:
+                18px;
+        }
+
+
+        .detail-label {
+
+            display:
+                block;
+
+            margin-bottom:
+                6px;
+
+            color:
+                #7a8797;
+
+            font-size:
+                12px;
+
+            font-weight:
+                700;
+
+            text-transform:
+                uppercase;
+        }
+
+
+        .detail-value {
+
+            color:
+                #172033;
+
+            font-size:
+                14px;
+
+            font-weight:
+                600;
+
+            word-break:
+                break-word;
+        }
+
+
+        .amount-value {
+
+            color:
+                #1769e0;
+
+            font-size:
+                16px;
+
+            font-weight:
+                800;
+        }
+
+
+        /* =====================================
+           ACTIONS
+        ===================================== */
+
+        .request-actions {
+
+            display:
+                flex;
+
+            gap:
+                10px;
+
+            margin-top:
+                17px;
+
+            padding-top:
+                15px;
+
+            border-top:
+                1px solid #e8edf3;
+        }
+
+
+        .request-actions form {
+
+            margin: 0;
+        }
+
+
+        .approve-btn,
+        .reject-btn {
+
+            height:
+                40px;
+
+            min-width:
+                105px;
+
+            padding:
+                0 18px;
+
+            border-radius:
+                7px;
+
+            font-family:
+                inherit;
+
+            font-size:
+                13px;
+
+            font-weight:
+                700;
+
+            cursor:
+                pointer;
+        }
+
+
+        .approve-btn {
+
+            border:
+                1px solid #1769e0;
+
+            background:
+                #1769e0;
+
+            color:
+                #ffffff;
+        }
+
+
+        .approve-btn:hover {
+
+            background:
+                #0d55bd;
+        }
+
+
+        .reject-btn {
+
+            border:
+                1px solid #cfe0fb;
+
+            background:
+                #edf4ff;
+
+            color:
+                #1769e0;
+        }
+
+
+        .reject-btn:hover {
+
+            background:
+                #dfeeff;
+        }
+
+
+        /* =====================================
+           STATUS LABEL
+        ===================================== */
+
+        .admin-approved-label {
+
+            display:
+                inline-block;
+
+            margin-top:
+                12px;
+
+            padding:
+                5px 9px;
+
+            border-radius:
+                6px;
+
+            background:
+                #edf4ff;
+
+            color:
+                #1769e0;
+
+            font-size:
+                11px;
+
+            font-weight:
+                800;
+        }
+
+
+        /* =====================================
+           EMPTY
+        ===================================== */
+
+        .empty-state {
+
+            padding:
+                30px 20px;
+
+            text-align:
+                center;
+
+            color:
+                #7a8797;
+
+            font-size:
+                14px;
+
+            border:
+                1px dashed #d5deea;
+
+            border-radius:
+                10px;
+        }
+
+
+        /* =====================================
+           TABLE
+        ===================================== */
+
+        .table-wrapper {
+
+            width: 100%;
+
+            overflow-x:
+                auto;
+
+            border:
+                1px solid #e1e8f0;
+
+            border-radius:
+                10px;
+        }
+
+
+        .history-table {
+
+            width: 100%;
+
+            min-width:
+                650px;
+
+            border-collapse:
+                collapse;
+        }
+
+
+        .history-table th {
+
+            padding:
+                14px 15px;
+
+            text-align:
+                left;
+
+            background:
+                #f5f8fc;
+
+            color:
+                #5c6979;
+
+            font-size:
+                12px;
+
+            font-weight:
+                800;
+
+            text-transform:
+                uppercase;
+
+            border-bottom:
+                1px solid #e1e8f0;
+
+            white-space:
+                nowrap;
+        }
+
+
+        .history-table td {
+
+            padding:
+                14px 15px;
+
+            color:
+                #273448;
+
+            font-size:
+                13px;
+
+            border-bottom:
+                1px solid #edf1f5;
+
+            white-space:
+                nowrap;
+        }
+
+
+        .history-table tr:last-child td {
+
+            border-bottom:
+                none;
+        }
+
+
+        .admin-label {
+
+            color:
+                #1769e0;
+
+            font-weight:
+                800;
+        }
+
+
+        .employee-label {
+
+            color:
+                #1769e0;
+
+            font-weight:
+                800;
+        }
+
+
+        /* =====================================
+           PAGINATION
+        ===================================== */
+
+        .pagination {
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                flex-end;
+
+            gap:
+                10px;
+
+            margin-top:
+                20px;
+
+            flex-wrap:
+                wrap;
+        }
+
+
+        .page-info {
+
+            color:
+                #6d7988;
+
+            font-size:
+                13px;
+        }
+
+
+        .pagination-btn {
+
+            min-width:
+                82px;
+
+            height:
+                38px;
+
+            padding:
+                0 15px;
+
+            display:
+                inline-flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            border-radius:
+                7px;
+
+            text-decoration:
+                none;
+
+            background:
+                #1769e0;
+
+            color:
+                #ffffff;
+
+            font-size:
+                13px;
+
+            font-weight:
+                700;
+        }
+
+
+        .pagination-btn:hover {
+
+            background:
+                #0d55bd;
+        }
+
+
+        /* =====================================
+           TABLET
+        ===================================== */
+
+        @media (
+            max-width: 800px
+        ) {
+
+            .top-navbar {
+
+                padding:
+                    0 20px;
+            }
+
+
+            .main-container {
+
+                width:
+                    calc(100% - 40px);
+            }
+
+
+            .pending-details {
+
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+
+        }
+
+
+        /* =====================================
+           MOBILE
+        ===================================== */
+
+        @media (
+            max-width: 600px
+        ) {
+
+            .top-navbar {
+
+                height:
+                    64px;
+
+                padding:
+                    0 16px;
+            }
+
+
+            .logo {
+
+                font-size:
+                    24px;
+            }
+
+
+            .nav-btn {
+
+                height:
+                    37px;
+
+                padding:
+                    0 11px;
+
+                font-size:
+                    12px;
+            }
+
+
+            .main-container {
+
+                width:
+                    calc(100% - 22px);
+
+                margin:
+                    20px auto 30px;
+            }
+
+
+            .section-container {
+
+                padding:
+                    18px;
+
+                border-radius:
+                    13px;
+            }
+
+
+            .section-title {
+
+                font-size:
+                    19px;
+            }
+
+
+            .pending-details {
+
+                grid-template-columns:
+                    1fr;
+            }
+
+
+            .request-actions {
+
+                flex-direction:
+                    column;
+            }
+
+
+            .request-actions form {
+
+                width:
+                    100%;
+            }
+
+
+            .approve-btn,
+            .reject-btn {
+
+                width:
+                    100%;
+            }
+
+
+            .pagination {
+
+                justify-content:
+                    space-between;
+            }
+
+
+            .page-info {
+
+                width:
+                    100%;
+            }
+
+
+            .pagination-btn {
+
+                flex:
+                    1;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================
+         NAVBAR
+    ===================================== -->
+
+    <nav class="top-navbar">
+
+
+        <div class="logo">
+            LP
+        </div>
+
+
+        <div class="nav-right">
+
+
+            <a
+                href="{{ url_for('employee.employee_dashboard') }}"
+                class="nav-btn home-btn"
+            >
+                Home
+            </a>
+
+
+            <a
+                href="{{ url_for('employee.employee_logout') }}"
+                class="nav-btn logout-btn"
+            >
+                Logout
+            </a>
+
+
+        </div>
+
+
+    </nav>
+
+
+    <main class="main-container">
+
+
+        <!-- =====================================
+             FLASH
+        ===================================== -->
+
+        {% with messages =
+            get_flashed_messages(
+                with_categories=true
+            )
+        %}
+
+            {% for category, message in messages %}
+
+                <div class="flash-message">
+
+                    {{ message }}
+
+                </div>
+
+            {% endfor %}
+
+        {% endwith %}
+
+
+        <!-- =====================================
+             EMPLOYEE ACTIONS
+        ===================================== -->
+
+        <section class="section-container">
+
+
+            <h2 class="section-title">
+
+                Top-up Requests
+
+            </h2>
+
+
+            {% if employee_topups %}
+
+
+                <div class="pending-list">
+
+
+                    {% for topup in employee_topups %}
+
+
+                        <div class="pending-item">
+
+
+                            <div class="pending-details">
+
+
+                                <div>
+
+                                    <span class="detail-label">
+                                        Phone Number
+                                    </span>
+
+                                    <span class="detail-value">
+                                        {{ topup.phonenumber }}
+                                    </span>
+
+                                </div>
+
+
+                                <div>
+
+                                    <span class="detail-label">
+                                        Date
+                                    </span>
+
+                                    <span class="detail-value">
+                                        {{ topup.date }}
+                                    </span>
+
+                                </div>
+
+
+                                <div>
+
+                                    <span class="detail-label">
+                                        Amount
+                                    </span>
+
+                                    <span class="detail-value amount-value">
+                                        ₹{{ "%.2f"|format(topup.amount|float) }}
+                                    </span>
+
+                                </div>
+
+
+                                <div>
+
+                                    <span class="detail-label">
+                                        UTR
+                                    </span>
+
+                                    <span class="detail-value">
+                                        {{ topup.utr }}
+                                    </span>
+
+                                </div>
+
+
+                            </div>
+
+
+                            {% if topup.approvedbyprimary == 1 %}
+
+                                <span class="admin-approved-label">
+
+                                    Already approved by Admin
+
+                                </span>
+
+                            {% endif %}
+
+
+                            <div class="request-actions">
+
+
+                                <form
+                                    method="POST"
+                                    action="{{
+                                        url_for(
+                                            'employee.employee_approve_topup',
+                                            topupid=topup.topupid
+                                        )
+                                    }}"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        class="approve-btn"
+                                    >
+                                        Approve
+                                    </button>
+
+                                </form>
+
+
+                                <form
+                                    method="POST"
+                                    action="{{
+                                        url_for(
+                                            'employee.employee_reject_topup',
+                                            topupid=topup.topupid
+                                        )
+                                    }}"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        class="reject-btn"
+                                    >
+                                        Reject
+                                    </button>
+
+                                </form>
+
+
+                            </div>
+
+
+                        </div>
+
+
+                    {% endfor %}
+
+
+                </div>
+
+
+            {% else %}
+
+
+                <div class="empty-state">
+
+                    No top-up requests require employee action.
+
+                </div>
+
+
+            {% endif %}
+
+
+            <!-- =====================================
+                 PENDING PAGINATION
+            ===================================== -->
+
+            {% if total_pending_pages > 1 %}
+
+
+                <div class="pagination">
+
+
+                    <span class="page-info">
+
+                        Page
+                        {{ pending_page }}
+                        of
+                        {{ total_pending_pages }}
+
+                    </span>
+
+
+                    {% if pending_page > 1 %}
+
+                        <a
+                            href="{{
+                                url_for(
+                                    'employee.employee_balance',
+                                    pending_page=pending_page - 1,
+                                    history_page=history_page
+                                )
+                            }}"
+                            class="pagination-btn"
+                        >
+                            Previous
+                        </a>
+
+                    {% endif %}
+
+
+                    {% if pending_page < total_pending_pages %}
+
+                        <a
+                            href="{{
+                                url_for(
+                                    'employee.employee_balance',
+                                    pending_page=pending_page + 1,
+                                    history_page=history_page
+                                )
+                            }}"
+                            class="pagination-btn"
+                        >
+                            Next
+                        </a>
+
+                    {% endif %}
+
+
+                </div>
+
+
+            {% endif %}
+
+
+        </section>
+
+
+        <!-- =====================================
+             TOP-UP HISTORY
+        ===================================== -->
+
+        <section class="section-container">
+
+
+            <h2 class="section-title">
+
+                Top-up History
+
+            </h2>
+
+
+            <div class="table-wrapper">
+
+
+                <table class="history-table">
+
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Phone Number
+                            </th>
+
+                            <th>
+                                Amount
+                            </th>
+
+                            <th>
+                                Date
+                            </th>
+
+                            <th>
+                                UTR
+                            </th>
+
+                            <th>
+                                Done By
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+
+                        {% if topup_history %}
+
+
+                            {% for item in topup_history %}
+
+
+                                <tr>
+
+
+                                    <td>
+                                        {{ item.phonenumber }}
+                                    </td>
+
+
+                                    <td>
+                                        ₹{{ "%.2f"|format(item.amount|float) }}
+                                    </td>
+
+
+                                    <td>
+                                        {{ item.date }}
+                                    </td>
+
+
+                                    <td>
+                                        {{ item.utr }}
+                                    </td>
+
+
+                                    <td>
+
+
+                                        {% if
+                                            item.approvedbyprimary == 1
+                                            and
+                                            item.approvedbysecondary == 1
+                                        %}
+
+                                            <span
+                                                class="employee-label"
+                                            >
+                                                Employee
+                                            </span>
+
+
+                                        {% elif
+                                            item.approvedbyprimary == 1
+                                        %}
+
+                                            <span
+                                                class="admin-label"
+                                            >
+                                                Admin
+                                            </span>
+
+
+                                        {% else %}
+
+                                            -
+
+                                        {% endif %}
+
+
+                                    </td>
+
+
+                                </tr>
+
+
+                            {% endfor %}
+
+
+                        {% else %}
+
+
+                            <tr>
+
+                                <td
+                                    colspan="5"
+                                    style="text-align:center; padding:25px;"
+                                >
+
+                                    No processed top-ups yet.
+
+                                </td>
+
+                            </tr>
+
+
+                        {% endif %}
+
+
+                    </tbody>
+
+
+                </table>
+
+
+            </div>
+
+
+            <!-- =====================================
+                 HISTORY PAGINATION
+            ===================================== -->
+
+            {% if total_history_pages > 1 %}
+
+
+                <div class="pagination">
+
+
+                    <span class="page-info">
+
+                        Page
+                        {{ history_page }}
+                        of
+                        {{ total_history_pages }}
+
+                    </span>
+
+
+                    {% if history_page > 1 %}
+
+                        <a
+                            href="{{
+                                url_for(
+                                    'employee.employee_balance',
+                                    pending_page=pending_page,
+                                    history_page=history_page - 1
+                                )
+                            }}"
+                            class="pagination-btn"
+                        >
+                            Previous
+                        </a>
+
+                    {% endif %}
+
+
+                    {% if history_page < total_history_pages %}
+
+                        <a
+                            href="{{
+                                url_for(
+                                    'employee.employee_balance',
+                                    pending_page=pending_page,
+                                    history_page=history_page + 1
+                                )
+                            }}"
+                            class="pagination-btn"
+                        >
+                            Next
+                        </a>
+
+                    {% endif %}
+
+
+                </div>
+
+
+            {% endif %}
+
+
+        </section>
+
+
+    </main>
+
+
+</body>
+
+</html>
