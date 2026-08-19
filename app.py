@@ -1938,6 +1938,7 @@ def ludo_roll_dice(matchbatchnumber):
         # Real user activity
         update_user_activity()
 
+
         with db_engine.begin() as connection:
 
             # =========================================
@@ -1964,6 +1965,7 @@ def ludo_roll_dice(matchbatchnumber):
                 }
             ).fetchone()
 
+
             # =========================================
             # MATCH NOT FOUND
             # =========================================
@@ -1974,6 +1976,7 @@ def ludo_roll_dice(matchbatchnumber):
                     "success": False,
                     "message": "Match not found"
                 }, 404
+
 
             # =========================================
             # VERIFY PLAYER
@@ -1995,6 +1998,7 @@ def ludo_roll_dice(matchbatchnumber):
                         "You are not part of this match"
                 }, 403
 
+
             # =========================================
             # MATCH MUST BE STARTED
             # =========================================
@@ -2007,6 +2011,7 @@ def ludo_roll_dice(matchbatchnumber):
                         "Match has not started"
                 }, 400
 
+
             # =========================================
             # MATCH MUST NOT BE TERMINATED
             # =========================================
@@ -2018,6 +2023,7 @@ def ludo_roll_dice(matchbatchnumber):
                     "message":
                         "Match has already ended"
                 }, 400
+
 
             # =========================================
             # GET GAME STATE
@@ -2042,6 +2048,7 @@ def ludo_roll_dice(matchbatchnumber):
                 }
             ).fetchone()
 
+
             # =========================================
             # GAME STATE NOT FOUND
             # =========================================
@@ -2053,6 +2060,7 @@ def ludo_roll_dice(matchbatchnumber):
                     "message":
                         "Game state not found"
                 }, 404
+
 
             # =========================================
             # CHECK TURN
@@ -2070,6 +2078,7 @@ def ludo_roll_dice(matchbatchnumber):
                         "It is not your turn"
                 }, 403
 
+
             # =========================================
             # PREVENT SECOND ROLL
             # =========================================
@@ -2082,6 +2091,7 @@ def ludo_roll_dice(matchbatchnumber):
                         "You must move a coin first"
                 }, 400
 
+
             # =========================================
             # GENERATE DICE
             # =========================================
@@ -2089,6 +2099,7 @@ def ludo_roll_dice(matchbatchnumber):
             dice = (
                 uuid.uuid4().int % 6
             ) + 1
+
 
             # =========================================
             # CONSECUTIVE SIX
@@ -2104,13 +2115,12 @@ def ludo_roll_dice(matchbatchnumber):
 
                 consecutive6 = 0
 
+
             # =========================================
             # THREE CONSECUTIVE SIXES
             # =========================================
 
             if consecutive6 >= 3:
-
-                # Reset dice state.
 
                 connection.execute(
                     text("""
@@ -2128,6 +2138,7 @@ def ludo_roll_dice(matchbatchnumber):
                             matchbatchnumber
                     }
                 )
+
 
                 # -----------------------------------------
                 # GIVE TURN TO OPPONENT
@@ -2148,6 +2159,7 @@ def ludo_roll_dice(matchbatchnumber):
                         match.initiateduseruuid
                     )
 
+
                 connection.execute(
                     text("""
                         UPDATE ludogamestate
@@ -2166,6 +2178,7 @@ def ludo_roll_dice(matchbatchnumber):
                             matchbatchnumber
                     }
                 )
+
 
                 # -----------------------------------------
                 # UPDATE ACTIVITY TIME
@@ -2210,6 +2223,7 @@ def ludo_roll_dice(matchbatchnumber):
                         }
                     )
 
+
                 return {
 
                     "success": True,
@@ -2226,27 +2240,58 @@ def ludo_roll_dice(matchbatchnumber):
                         next_player
                 }
 
+
             # =========================================
             # CHECK WHETHER ANY COIN CAN MOVE
+            # =========================================
+            #
+            # Legal move:
+            #
+            # 1. HOME coin + dice 6
+            #
+            # OR
+            #
+            # 2. Existing coin whose movement
+            #    does not exceed 57.
+            #
+            # This check applies to 6 as well.
             # =========================================
 
             movable_coin = connection.execute(
                 text("""
                     SELECT
                         coinindex
+
                     FROM ludocoins
+
                     WHERE
                         matchbatchnumber =
                             :matchbatchnumber
+
                     AND
                         playeruuid =
                             :playeruuid
+
                     AND
                         finished = 0
+
                     AND
-                        position >= 0
-                    AND
-                        stepsmoved + :dice <= 57
+                    (
+                        (
+                            position = -1
+                            AND
+                            :dice = 6
+                        )
+
+                        OR
+
+                        (
+                            position >= 0
+                            AND
+                            stepsmoved + :dice <= 57
+                        )
+                    )
+
                     LIMIT 1
                 """),
                 {
@@ -2261,15 +2306,26 @@ def ludo_roll_dice(matchbatchnumber):
                 }
             ).fetchone()
 
+
             # =========================================
             # NO LEGAL MOVE
             # =========================================
+            #
+            # Example:
+            #
+            # Coin = 54
+            # Dice = 6
+            #
+            # 54 + 6 = 60
+            #
+            # Therefore the coin cannot move.
+            #
+            # If no other coin can move, the turn
+            # automatically passes to the opponent.
+            # =========================================
 
-            if (
-                dice != 6
-                and
-                not movable_coin
-            ):
+            if not movable_coin:
+
 
                 # -----------------------------------------
                 # DETERMINE NEXT PLAYER
@@ -2290,6 +2346,7 @@ def ludo_roll_dice(matchbatchnumber):
                         match.initiateduseruuid
                     )
 
+
                 # -----------------------------------------
                 # UPDATE GAME STATE
                 # -----------------------------------------
@@ -2306,6 +2363,7 @@ def ludo_roll_dice(matchbatchnumber):
                             mustmove = 0,
 
                             consecutivesix = 0
+
                         WHERE
                             matchbatchnumber =
                                 :matchbatchnumber
@@ -2318,6 +2376,7 @@ def ludo_roll_dice(matchbatchnumber):
                             matchbatchnumber
                     }
                 )
+
 
                 # -----------------------------------------
                 # UPDATE ACTIVITY TIME
@@ -2361,6 +2420,7 @@ def ludo_roll_dice(matchbatchnumber):
                                 matchbatchnumber
                         }
                     )
+
 
                 # -----------------------------------------
                 # RETURN
@@ -2383,6 +2443,7 @@ def ludo_roll_dice(matchbatchnumber):
                         next_player
                 }
 
+
             # =========================================
             # NORMAL DICE RESULT
             # =========================================
@@ -2397,6 +2458,7 @@ def ludo_roll_dice(matchbatchnumber):
                             :consecutive6,
 
                         mustmove = 1
+
                     WHERE
                         matchbatchnumber =
                             :matchbatchnumber
@@ -2412,6 +2474,7 @@ def ludo_roll_dice(matchbatchnumber):
                         matchbatchnumber
                 }
             )
+
 
             # =========================================
             # UPDATE PLAYER ACTIVITY TIME
@@ -2456,6 +2519,7 @@ def ludo_roll_dice(matchbatchnumber):
                     }
                 )
 
+
         # =========================================
         # SUCCESS
         # =========================================
@@ -2478,6 +2542,7 @@ def ludo_roll_dice(matchbatchnumber):
                 current_userid
         }
 
+
     except Exception:
 
         return {
@@ -2486,9 +2551,11 @@ def ludo_roll_dice(matchbatchnumber):
                 "Unable to roll dice"
         }, 500
 
-    finally:
-        pass
 
+    finally:
+
+        pass
+        
 
 @app.route(
     "/ludo-move-coin/<matchbatchnumber>",
